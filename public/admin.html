@@ -658,6 +658,8 @@ Rezervasyon için: https://tesislerrezervasyon.ibb.istanbul</textarea>
             <div class="etab active" onclick="switchEtab('typography',this)">Yazı</div>
             <div class="etab" onclick="switchEtab('colors',this)">Renkler</div>
             <div class="etab" onclick="switchEtab('buttons',this)">Butonlar</div>
+            <div class="etab" onclick="switchEtab('acilan',this)">Açılanlar</div>
+            <div class="etab" onclick="switchEtab('bg',this)">Arka Plan</div>
             <div class="etab" onclick="switchEtab('layout',this)">Düzen</div>
           </div>
 
@@ -859,6 +861,98 @@ Rezervasyon için: https://tesislerrezervasyon.ibb.istanbul</textarea>
               </div>
             </div>
 
+
+            <!-- SON AÇILANLAR BÖLÜMÜ -->
+            <div class="etab-content" id="etab-acilan">
+              <div class="esec">
+                <div class="esec-title">Kart Renkleri</div>
+                <div class="erow">
+                  <div><div class="erow-label">Kart Arka Planı</div></div>
+                  <input type="color" class="e-color" id="e-sa-bg" value="#F0FDF4" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Kart Kenarlık</div></div>
+                  <input type="color" class="e-color" id="e-sa-border" value="#BBF7D0" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Köşe Yarıçapı</div><div class="erow-desc"><span id="e-sa-radius-val">14</span>px</div></div>
+                  <input type="range" class="e-range" id="e-sa-radius" min="0" max="28" value="14" oninput="document.getElementById('e-sa-radius-val').textContent=this.value;liveEdit()">
+                </div>
+              </div>
+              <div class="esec">
+                <div class="esec-title">Yazı Renkleri</div>
+                <div class="erow">
+                  <div><div class="erow-label">Başlık ("Son 30 Dk...")</div></div>
+                  <input type="color" class="e-color" id="e-sa-title-color" value="#15803D" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Tesis Adı</div></div>
+                  <input type="color" class="e-color" id="e-sa-name-color" value="#14532D" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Tarih Metni</div></div>
+                  <input type="color" class="e-color" id="e-sa-date-color" value="#16A34A" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Zaman Rengi</div></div>
+                  <input type="color" class="e-color" id="e-sa-time-color" value="#86EFAC" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Ayraç Rengi</div></div>
+                  <input type="color" class="e-color" id="e-sa-divider" value="#BBF7D0" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Yeşil Nokta</div></div>
+                  <input type="color" class="e-color" id="e-sa-dot" value="#22C55E" oninput="liveEdit()">
+                </div>
+              </div>
+              <div class="esec">
+                <div class="esec-title">Rezervasyon Butonu</div>
+                <div class="erow">
+                  <div><div class="erow-label">Buton Arka Plan</div></div>
+                  <input type="color" class="e-color" id="e-sa-btn-bg" value="#22C55E" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Buton Metin</div></div>
+                  <input type="color" class="e-color" id="e-sa-btn-color" value="#ffffff" oninput="liveEdit()">
+                </div>
+              </div>
+            </div>
+
+            <!-- ARKA PLAN -->
+            <div class="etab-content" id="etab-bg">
+              <div class="esec">
+                <div class="esec-title">Hero Arka Plan Görseli</div>
+                <div class="erow" style="flex-direction:column;align-items:flex-start;gap:6px">
+                  <div class="erow-label">Görsel URL</div>
+                  <input type="text" class="e-input" id="e-hero-img-url" placeholder="https://images.unsplash.com/..." style="width:100%" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Şeffaflık (overlay)</div><div class="erow-desc"><span id="e-hero-overlay-val">75</span>%</div></div>
+                  <input type="range" class="e-range" id="e-hero-overlay" min="0" max="100" value="75" oninput="document.getElementById('e-hero-overlay-val').textContent=this.value;liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Overlay Rengi</div></div>
+                  <input type="color" class="e-color" id="e-hero-overlay-color" value="#F8F6F1" oninput="liveEdit()">
+                </div>
+                <div style="margin-top:8px;font-size:11px;color:var(--muted)">💡 Unsplash önerisi: <a href="https://unsplash.com/s/photos/istanbul" target="_blank" style="color:var(--gold)">unsplash.com/s/photos/istanbul</a> → sağ tık → görsel adresi kopyala</div>
+              </div>
+              <div class="esec">
+                <div class="esec-title">Sayfa Genel Arka Planı</div>
+                <div class="erow">
+                  <div><div class="erow-label">Arka Plan Rengi</div></div>
+                  <input type="color" class="e-color" id="e-page-bg2" value="#F8F6F1" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Doku Efekti</div></div>
+                  <select class="e-select" id="e-texture" onchange="liveEdit()">
+                    <option value="on" selected>Açık (ince tane)</option>
+                    <option value="off">Kapalı (düz)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
           </div><!-- /editor-sections -->
 
           <div class="editor-save-bar">
@@ -995,19 +1089,28 @@ function loadEditorValues(){
 }
 
 function collectEditorData(){
-  const g = id => document.getElementById(id)?.value;
+  const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
   return {
     h1Font: g('e-h1-font'), h1Size: g('e-h1-size'), h1Color: g('e-h1-color'),
     bodyFont: g('e-body-font'), bodySize: g('e-body-size'), bodyColor: g('e-body-color'),
-    lineHeight: parseFloat(g('e-line-height'))/10,
+    lineHeight: parseFloat(g('e-line-height')||'17')/10,
     navBg: g('e-nav-bg'), navColor: g('e-nav-color'), navLogo: g('e-nav-logo'), navIcon: g('e-nav-icon'),
     footerText: g('e-footer-text'),
-    accent: g('e-accent'), pageBg: g('e-page-bg'), cardBg: g('e-card-bg'),
+    accent: g('e-accent'), pageBg: g('e-page-bg2')||g('e-page-bg'), cardBg: g('e-card-bg'),
     cardBorder: g('e-card-border'), heroBg: g('e-hero-bg'),
     tcardBg: g('e-tcard-bg'), tcardSel: g('e-tcard-sel'), tcardText: g('e-tcard-text'), tcardRadius: g('e-tcard-radius'),
     btnBg: g('e-btn-bg'), btnColor: g('e-btn-color'), btnRadius: g('e-btn-radius'),
     btnSize: g('e-btn-size'), btnText: g('e-btn-text'),
-    maxWidth: g('e-maxwidth'), cardShadow: g('e-card-shadow'), cardRadius: g('e-card-radius-range')
+    maxWidth: g('e-maxwidth'), cardShadow: g('e-card-shadow'), cardRadius: g('e-card-radius-range'),
+    // Son açılanlar
+    saBg: g('e-sa-bg'), saBorder: g('e-sa-border'), saRadius: g('e-sa-radius'),
+    saTitleColor: g('e-sa-title-color'), saNameColor: g('e-sa-name-color'),
+    saDateColor: g('e-sa-date-color'), saTimeColor: g('e-sa-time-color'),
+    saDivider: g('e-sa-divider'), saDot: g('e-sa-dot'),
+    saBtnBg: g('e-sa-btn-bg'), saBtnColor: g('e-sa-btn-color'),
+    // Arka plan
+    heroImgUrl: g('e-hero-img-url'), heroOverlay: g('e-hero-overlay'),
+    heroOverlayColor: g('e-hero-overlay-color'), texture: g('e-texture')
   };
 }
 
@@ -1035,38 +1138,59 @@ function updateBtnPreview(){
 function refreshPreview(){
   const d = collectEditorData();
   const shadows = {none:'none',small:'0 2px 8px rgba(0,0,0,.06)',medium:'0 8px 32px rgba(0,0,0,.08)',large:'0 20px 60px rgba(0,0,0,.14)'};
+  const overlay = d.heroOverlayColor||'#F8F6F1';
+  const overlayAlpha = Math.round(((parseInt(d.heroOverlay||75))/100)*255).toString(16).padStart(2,'0');
+  const heroBg = d.heroImgUrl
+    ? `url(${d.heroImgUrl}) center/cover no-repeat`
+    : (d.pageBg||'#F8F6F1');
+
   const css = `
-    :root { --gold: ${d.accent||'#B8821E'}; --accent: ${d.accent||'#B8821E'}; }
+    :root {
+      --gold: ${d.accent||'#B8821E'};
+      --sa-bg: ${d.saBg||'#F0FDF4'};
+      --sa-border: ${d.saBorder||'#BBF7D0'};
+      --sa-radius: ${d.saRadius||14}px;
+      --sa-title-color: ${d.saTitleColor||'#15803D'};
+      --sa-item-name-color: ${d.saNameColor||'#14532D'};
+      --sa-item-date-color: ${d.saDateColor||'#16A34A'};
+      --sa-time-color: ${d.saTimeColor||'#86EFAC'};
+      --sa-divider: ${d.saDivider||'#BBF7D0'};
+      --sa-dot-color: ${d.saDot||'#22C55E'};
+      --sa-btn-bg: ${d.saBtnBg||'#22C55E'};
+      --sa-btn-color: ${d.saBtnColor||'#ffffff'};
+    }
     body { background: ${d.pageBg||'#F8F6F1'} !important; font-family: ${d.bodyFont||"'Syne',sans-serif"} !important; font-size: ${d.bodySize||15}px !important; color: ${d.bodyColor||'#5C5750'} !important; line-height: ${d.lineHeight||1.7} !important; }
-    nav { background: ${d.navBg||'#F8F6F1'} !important; color: ${d.navColor||'#1A1714'} !important; }
-    .nav-logo-text { color: ${d.navColor||'#1A1714'} !important; }
-    .nav-link { color: ${d.navColor||'#1A1714'} !important; }
-    .hero { background: ${d.heroBg||'#F8F6F1'} !important; }
+    ${d.texture==='off' ? 'body::before{display:none!important}' : ''}
+    nav { background: ${d.navBg||'rgba(248,246,241,0.92)'} !important; }
+    .nav-logo-text, .nav-link { color: ${d.navColor||'#1A1714'} !important; }
+    .hero { background: ${heroBg} !important; position:relative; }
+    ${d.heroImgUrl ? `.hero::after{content:'';position:absolute;inset:0;background:${overlay}${overlayAlpha};z-index:0;border-radius:inherit} .hero>*{position:relative;z-index:1}` : ''}
     .hero h1 { font-family: ${d.h1Font||"'Instrument Serif',serif"} !important; font-size: ${d.h1Size||48}px !important; color: ${d.h1Color||'#1A1714'} !important; }
-    .form-wrap, .form-card { max-width: ${d.maxWidth||580}px !important; }
+    .form-wrap { max-width: ${d.maxWidth||580}px !important; }
     .form-card { background: ${d.cardBg||'#fff'} !important; border-color: ${d.cardBorder||'#EAE7E2'} !important; border-radius: ${d.cardRadius||20}px !important; box-shadow: ${shadows[d.cardShadow||'medium']} !important; }
     .btn-main { background: ${d.btnBg||'#1A1714'} !important; color: ${d.btnColor||'#fff'} !important; border-radius: ${d.btnRadius||12}px !important; }
-    .tesis-item { background: ${d.tcardBg||'#fff'} !important; border-radius: ${d.tcardRadius||10}px !important; color: ${d.tcardText||'#1A1714'} !important; }
-    .tesis-item.selected { background: ${d.tcardSel||'#B8821E'} !important; border-color: ${d.tcardSel||'#B8821E'} !important; }
+    .tesis-item { background: ${d.tcardBg||'#fafaf7'} !important; border-radius: ${d.tcardRadius||9}px !important; color: ${d.tcardText||'#1A1714'} !important; }
+    .tesis-item.selected { background: ${d.tcardSel||'#B8821E'}22 !important; border-color: ${d.tcardSel||'#B8821E'} !important; }
+    .sa-card { background: ${d.saBg||'#F0FDF4'} !important; border-color: ${d.saBorder||'#BBF7D0'} !important; border-radius: ${d.saRadius||14}px !important; }
+    .sa-title { color: ${d.saTitleColor||'#15803D'} !important; }
+    .sa-item-name { color: ${d.saNameColor||'#14532D'} !important; }
+    .sa-item-date { color: ${d.saDateColor||'#16A34A'} !important; }
+    .sa-item-ago, .sa-time { color: ${d.saTimeColor||'#86EFAC'} !important; }
+    .sa-item { border-color: ${d.saDivider||'#BBF7D0'} !important; }
+    .sa-dot { background: ${d.saDot||'#22C55E'} !important; }
+    .sa-item-btn { background: ${d.saBtnBg||'#22C55E'} !important; color: ${d.saBtnColor||'white'} !important; }
   `;
   const iframe = document.getElementById('preview-iframe');
-  // CSS'i iframe'e enjekte et
   try {
     const iDoc = iframe.contentDocument || iframe.contentWindow.document;
     let styleEl = iDoc.getElementById('admin-editor-css');
-    if(!styleEl){
-      styleEl = iDoc.createElement('style');
-      styleEl.id = 'admin-editor-css';
-      iDoc.head.appendChild(styleEl);
-    }
+    if(!styleEl){ styleEl = iDoc.createElement('style'); styleEl.id = 'admin-editor-css'; iDoc.head.appendChild(styleEl); }
     styleEl.textContent = css;
-    // Nav logo güncelle
     if(d.navLogo){ const el = iDoc.querySelector('.nav-logo-text'); if(el) el.textContent = d.navLogo; }
     if(d.navIcon){ const el = iDoc.querySelector('.nav-logo-icon'); if(el) el.textContent = d.navIcon; }
     if(d.btnText){ const el = iDoc.querySelector('.btn-main'); if(el) el.textContent = d.btnText; }
-    // Footer
-    if(d.footerText){ const el = iDoc.querySelector('footer'); if(el) el.textContent = d.footerText; }
-  } catch(e) { console.log('Preview inject error:', e); }
+    if(d.footerText){ const el = iDoc.querySelector('.footer-note'); if(el) el.textContent = d.footerText; }
+  } catch(e) { console.log('Preview inject:', e); }
 }
 
 function saveEditor(){

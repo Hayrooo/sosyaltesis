@@ -186,3 +186,21 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
   footer{padding:18px 16px;flex-direction:column}
   .page-wrap{padding:36px 16px 60px}
 }
+
+/* SON AÇILANLAR */
+.sa-wrap{display:none;max-width:580px;margin:0 auto;padding:0 24px 8px}
+.sa-card{background:var(--sa-bg, #F0FDF4);border:1.5px solid var(--sa-border, #BBF7D0);border-radius:var(--sa-radius, 14px);padding:16px 20px}
+.sa-header-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sa-dot{width:8px;height:8px;background:var(--sa-dot-color, #22C55E);border-radius:50%;display:inline-block;animation:blink 1.5s infinite;flex-shrink:0}
+.sa-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sa-title-color, #15803D)}
+.sa-time{margin-left:auto;font-size:11px;color:var(--sa-time-color, #86EFAC)}
+.sa-list{display:flex;flex-direction:column;gap:0}
+.sa-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--sa-divider, #BBF7D0)}
+.sa-item:last-child{border-bottom:none}
+.sa-item-name{font-size:13px;font-weight:600;color:var(--sa-item-name-color, #14532D)}
+.sa-item-date{font-size:11px;color:var(--sa-item-date-color, #16A34A);margin-top:2px}
+.sa-item-ago{font-size:11px;color:var(--sa-time-color, #86EFAC)}
+.sa-item-btn{font-size:11px;font-weight:700;background:var(--sa-btn-bg, #22C55E);color:var(--sa-btn-color, white);border-radius:6px;padding:5px 10px;text-decoration:none;white-space:nowrap;transition:opacity .2s}
+.sa-item-btn:hover{opacity:.85}
+
+/* EDİTÖR CSS DEĞİŞKENLERİ — admin panelinden yazılır */

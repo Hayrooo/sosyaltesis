@@ -43,14 +43,14 @@
 </div>
 
 <!-- SON AÇILANLAR -->
-<div id="son-acilan-wrap" style="display:none;max-width:580px;margin:0 auto;padding:0 24px 8px">
-  <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 20px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-      <span style="width:8px;height:8px;background:#22C55E;border-radius:50%;display:inline-block;animation:blink 1.5s infinite"></span>
-      <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#15803D">Son 30 Dakikada Açılanlar</span>
-      <span style="margin-left:auto;font-size:11px;color:#86EFAC" id="sa-guncelleme"></span>
+<div id="son-acilan-wrap" class="sa-wrap">
+  <div class="sa-card">
+    <div class="sa-header-row">
+      <span class="sa-dot"></span>
+      <span class="sa-title">Son 30 Dakikada Açılanlar</span>
+      <span class="sa-time" id="sa-guncelleme"></span>
     </div>
-    <div id="sa-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="sa-list" class="sa-list"></div>
   </div>
 </div>
 
@@ -188,24 +188,42 @@
   if(Object.keys(ed).length > 0){
     const shadows = {none:'none',small:'0 2px 8px rgba(0,0,0,.06)',medium:'0 8px 32px rgba(0,0,0,.08)',large:'0 20px 60px rgba(0,0,0,.14)'};
     const style = document.createElement('style');
+    const overlayAlpha = ed.heroOverlay ? Math.round((parseInt(ed.heroOverlay)/100)*255).toString(16).padStart(2,'0') : 'bf';
+    const overlayColor = (ed.heroOverlayColor||'#F8F6F1') + overlayAlpha;
     style.textContent = `
+      :root {
+        ${ed.accent?`--gold:${ed.accent};`:''}
+        ${ed.saBg?`--sa-bg:${ed.saBg};`:''}
+        ${ed.saBorder?`--sa-border:${ed.saBorder};`:''}
+        ${ed.saRadius?`--sa-radius:${ed.saRadius}px;`:''}
+        ${ed.saTitleColor?`--sa-title-color:${ed.saTitleColor};`:''}
+        ${ed.saNameColor?`--sa-item-name-color:${ed.saNameColor};`:''}
+        ${ed.saDateColor?`--sa-item-date-color:${ed.saDateColor};`:''}
+        ${ed.saTimeColor?`--sa-time-color:${ed.saTimeColor};`:''}
+        ${ed.saDivider?`--sa-divider:${ed.saDivider};`:''}
+        ${ed.saDot?`--sa-dot-color:${ed.saDot};`:''}
+        ${ed.saBtnBg?`--sa-btn-bg:${ed.saBtnBg};`:''}
+        ${ed.saBtnColor?`--sa-btn-color:${ed.saBtnColor};`:''}
+      }
       body { ${ed.bodyFont?`font-family:${ed.bodyFont}!important;`:''}${ed.bodySize?`font-size:${ed.bodySize}px!important;`:''}${ed.bodyColor?`color:${ed.bodyColor}!important;`:''}${ed.lineHeight?`line-height:${ed.lineHeight}!important;`:''} }
       ${ed.pageBg?`body{background:${ed.pageBg}!important}`:''}
-      ${ed.accent?`:root{--gold:${ed.accent}}`:''}
+      ${ed.texture==='off'?'body::before{display:none!important}':''}
       nav { ${ed.navBg?`background:${ed.navBg}!important;`:''} }
-      .nav-logo-text, .nav-link { ${ed.navColor?`color:${ed.navColor}!important;`:''} }
-      .hero { ${ed.heroBg?`background:${ed.heroBg}!important;`:''} }
+      .nav-logo-text,.nav-link { ${ed.navColor?`color:${ed.navColor}!important;`:''} }
+      .hero { ${ed.heroImgUrl?`background:url(${ed.heroImgUrl}) center/cover no-repeat !important;position:relative;`:(ed.heroBg?`background:${ed.heroBg}!important;`:'')} }
+      ${ed.heroImgUrl?`.hero::after{content:'';position:absolute;inset:0;background:${overlayColor};z-index:0;border-radius:inherit}.hero>*{position:relative;z-index:1}`:''}
       .hero h1 { ${ed.h1Font?`font-family:${ed.h1Font}!important;`:''}${ed.h1Size?`font-size:${ed.h1Size}px!important;`:''}${ed.h1Color?`color:${ed.h1Color}!important;`:''} }
       .form-wrap { ${ed.maxWidth?`max-width:${ed.maxWidth}px!important;`:''} }
-      .form-card { ${ed.cardBg?`background:${ed.cardBg}!important;`:''}${ed.cardBorder?`border-color:${ed.cardBorder}!important;`:''}${ed.cardRadius?`border-radius:${ed.cardRadius}px!important;`:''}${ed.cardShadow?`box-shadow:${shadows[ed.cardShadow]}!important;`:''} }
+      .form-card { ${ed.cardBg?`background:${ed.cardBg}!important;`:''}${ed.cardBorder?`border-color:${ed.cardBorder}!important;`:''}${ed.cardRadius?`border-radius:${ed.cardRadius}px!important;`:''}${ed.cardShadow&&shadows[ed.cardShadow]?`box-shadow:${shadows[ed.cardShadow]}!important;`:''} }
       .btn-main { ${ed.btnBg?`background:${ed.btnBg}!important;`:''}${ed.btnColor?`color:${ed.btnColor}!important;`:''}${ed.btnRadius?`border-radius:${ed.btnRadius}px!important;`:''} }
       .tesis-item { ${ed.tcardBg?`background:${ed.tcardBg}!important;`:''}${ed.tcardRadius?`border-radius:${ed.tcardRadius}px!important;`:''}${ed.tcardText?`color:${ed.tcardText}!important;`:''} }
-      .tesis-item.selected { ${ed.tcardSel?`background:${ed.tcardSel}!important;border-color:${ed.tcardSel}!important;`:''} }
+      .tesis-item.selected { ${ed.tcardSel?`background:${ed.tcardSel}22!important;border-color:${ed.tcardSel}!important;`:''} }
     `;
     document.head.appendChild(style);
     if(ed.navLogo){ const el = document.querySelector('.nav-logo-text'); if(el) el.textContent = ed.navLogo; }
     if(ed.navIcon){ const el = document.querySelector('.nav-logo-icon'); if(el) el.textContent = ed.navIcon; }
     if(ed.btnText){ const el = document.querySelector('.btn-main'); if(el) el.textContent = ed.btnText; }
+    if(ed.footerText){ const el = document.querySelector('.footer-note'); if(el) el.textContent = ed.footerText; }
   }
 
   // METİNLER
@@ -226,49 +244,46 @@ const JSONBIN_ACCESS_KEY = '$2a$10$9XSPJG1OQ9W3styF0tcyxOzqOWHRHexUwDGp2X4SgZ6sb
 
 async function loadSonAcilanlar() {
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-      headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
-    });
+    const res = await fetch(
+      `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,
+      { headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY, 'X-Bin-Meta': 'false' } }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    const list = data.record?.acilan_tesisler || [];
+    const list = Array.isArray(data) ? data : (data.record?.acilan_tesisler || data.acilan_tesisler || []);
 
-    // Son 30 dakikayı filtrele
     const now = Date.now();
     const son30 = list.filter(t => (now - new Date(t.zaman).getTime()) < 30 * 60 * 1000);
 
-    if (son30.length === 0) return; // Hiç yoksa bölümü gösterme
+    const wrap = document.getElementById('son-acilan-wrap');
+    if (son30.length === 0) { wrap.style.display = 'none'; return; }
 
-    document.getElementById('son-acilan-wrap').style.display = 'block';
-    document.getElementById('sa-guncelleme').textContent = 'Az önce güncellendi';
+    wrap.style.display = 'block';
+    const dk0 = Math.floor((now - new Date(son30[0].zaman).getTime()) / 60000);
+    document.getElementById('sa-guncelleme').textContent = dk0 < 1 ? 'Az önce' : dk0 + ' dk önce';
 
     const saList = document.getElementById('sa-list');
     saList.innerHTML = son30.map(t => {
       const dk = Math.floor((now - new Date(t.zaman).getTime()) / 60000);
       const dkText = dk < 1 ? 'Az önce' : dk + ' dk önce';
-      return `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #BBF7D0">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:#14532D">${t.tesis}</div>
-            <div style="font-size:11px;color:#16A34A;margin-top:2px">${t.tarih} tarihi açıldı</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:11px;color:#86EFAC">${dkText}</span>
-            <a href="${t.url}" target="_blank" style="font-size:11px;font-weight:700;background:#22C55E;color:white;border-radius:6px;padding:5px 10px;text-decoration:none">Rezervasyon →</a>
-          </div>
-        </div>`;
+      return `<div class="sa-item">
+        <div>
+          <div class="sa-item-name">${t.tesis}</div>
+          <div class="sa-item-date">${t.tarih} tarihi açıldı</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="sa-item-ago">${dkText}</span>
+          <a href="${t.url}" target="_blank" class="sa-item-btn">Rezervasyon →</a>
+        </div>
+      </div>`;
     }).join('');
 
-    // Son satırın border'ını kaldır
-    const items = saList.querySelectorAll('div');
-    if (items.length) items[items.length-1].style.borderBottom = 'none';
-
   } catch(e) {
-    console.log('Son açılanlar yüklenemedi:', e);
+    console.log('Son açılanlar yüklenemedi:', e.message);
   }
 }
 
 loadSonAcilanlar();
-// Her 5 dakikada bir yenile
 setInterval(loadSonAcilanlar, 5 * 60 * 1000);
 </script>
 <script>initIndex();</script>
