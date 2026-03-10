@@ -238,22 +238,33 @@
   }
 })();
 
-// ── SON AÇILANLAR (JSONBin) ──
-const JSONBIN_BIN_ID = '69afdd97aeb53c760cdeecd4';
-const JSONBIN_ACCESS_KEY = '$2a$10$9XSPJG1OQ9W3styF0tcyxOzqOWHRHexUwDGp2X4SgZ6sbL6hw9uuC';
+// ── SON AÇILANLAR (Google Sheets) ──
+const SHEET_ID = '1StgUt9qTxEsvJkkUd85SKfm39TYJfISsIewEpPS5JNU';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Bosluklar`;
 
 async function loadSonAcilanlar() {
   try {
-    const res = await fetch(
-      `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`,
-      { headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY, 'X-Bin-Meta': 'false' } }
-    );
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const list = Array.isArray(data) ? data : (data.record?.acilan_tesisler || data.acilan_tesisler || []);
+    const res = await fetch(SHEET_URL);
+    const text = await res.text();
+    // Google Sheets JSON wrapper'ını temizle
+    const json = JSON.parse(text.replace(/^.*?\(/, '').replace(/\);?$/, ''));
+    const rows = json.table?.rows || [];
 
     const now = Date.now();
-    const son30 = list.filter(t => (now - new Date(t.zaman).getTime()) < 30 * 60 * 1000);
+    const son30 = [];
+
+    rows.forEach(row => {
+      if (!row.c || !row.c[4]) return;
+      const tesis  = row.c[0]?.v || '';
+      const tarih  = row.c[2]?.v || '';
+      const url    = row.c[3]?.v || '';
+      const zaman  = row.c[4]?.v || '';
+      if (!zaman) return;
+      const zamanMs = new Date(zaman).getTime();
+      if ((now - zamanMs) < 30 * 60 * 1000) {
+        son30.push({ tesis, tarih, url, zaman });
+      }
+    });
 
     const wrap = document.getElementById('son-acilan-wrap');
     if (son30.length === 0) { wrap.style.display = 'none'; return; }
@@ -262,8 +273,7 @@ async function loadSonAcilanlar() {
     const dk0 = Math.floor((now - new Date(son30[0].zaman).getTime()) / 60000);
     document.getElementById('sa-guncelleme').textContent = dk0 < 1 ? 'Az önce' : dk0 + ' dk önce';
 
-    const saList = document.getElementById('sa-list');
-    saList.innerHTML = son30.map(t => {
+    document.getElementById('sa-list').innerHTML = son30.map(t => {
       const dk = Math.floor((now - new Date(t.zaman).getTime()) / 60000);
       const dkText = dk < 1 ? 'Az önce' : dk + ' dk önce';
       return `<div class="sa-item">
@@ -284,7 +294,7 @@ async function loadSonAcilanlar() {
 }
 
 loadSonAcilanlar();
-setInterval(loadSonAcilanlar, 5 * 60 * 1000);
+setInterval(loadSonAcilanlar, 60 * 1000); // Her 1 dakikada yenile
 </script>
 <script>initIndex();</script>
 </body>
