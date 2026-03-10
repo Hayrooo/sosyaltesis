@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tesisler — Sosyal Tesis Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">🔔</div>
+    <span class="nav-logo-text">Sosyal Tesis Takip</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Takip</a>
+    <a class="nav-link" href="forum.html">Forum</a>
+    <a class="nav-link active" href="tesisler.html">Tesisler</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 style="font-family:'Instrument Serif',serif;font-size:clamp(28px,4vw,42px);font-weight:400;margin-bottom:10px">
+      İBB <em style="font-style:italic;color:var(--gold)">Sosyal Tesisleri</em>
+    </h1>
+    <p style="color:var(--muted);font-size:14px">Tüm 17 tesis — konumlar, linkler ve takip butonu</p>
+  </div>
+
+  <div class="tesis-grid-page" id="tesis-grid"></div>
+</div>
+
+<footer>
+  <div class="footer-note">Bağımsız bir bildirim servisidir. İBB ile resmi bağlantısı yoktur. &nbsp;·&nbsp; <a href="https://tesislerrezervasyon.ibb.istanbul" target="_blank">Resmi Rezervasyon Sitesi</a></div>
+  <div class="footer-links">
+    <a href="forum.html">Forum</a>
+    <a href="index.html">Takip</a>
+    <a href="gizlilik.html">Gizlilik</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+const TESISLER_DATA = [
+  {id:1,  name:"Altınboynuz Sosyal Tesisi",      il:"Eyüpsultan", emoji:"🏛️"},
+  {id:2,  name:"Beykoz Sahil Sosyal Tesisi",     il:"Beykoz",     emoji:"🌊"},
+  {id:3,  name:"Beykoz Koru Sosyal Tesisi",      il:"Beykoz",     emoji:"🌲"},
+  {id:4,  name:"Cihangir Sosyal Tesisi",         il:"Beyoğlu",    emoji:"🏙️"},
+  {id:5,  name:"Çamlıca Sosyal Tesisi",          il:"Üsküdar",    emoji:"🌿"},
+  {id:6,  name:"Dragos Sosyal Tesisi",           il:"Kartal",     emoji:"⚓"},
+  {id:7,  name:"Fethipaşa Sosyal Tesisleri",     il:"Üsküdar",    emoji:"🌳"},
+  {id:8,  name:"Florya Sosyal Tesisleri",        il:"Bakırköy",   emoji:"🏖️"},
+  {id:9,  name:"Gözdağı Sosyal Tesisi",          il:"Pendik",     emoji:"⛰️"},
+  {id:10, name:"Haliç Sosyal Tesisi",            il:"Fatih",      emoji:"🌉"},
+  {id:11, name:"İstinye Sosyal Tesisi",          il:"Sarıyer",    emoji:"⛵"},
+  {id:12, name:"Kasımpaşa Sosyal Tesisi",        il:"Kasımpaşa",  emoji:"🏘️"},
+  {id:13, name:"Küçük Çamlıca Sosyal Tesisi",   il:"Üsküdar",    emoji:"🌸"},
+  {id:14, name:"Küçükçekmece Sosyal Tesisi",     il:"Küçükçekmece",emoji:"🏞️"},
+  {id:15, name:"Pembe Köşk Sosyal Tesisi",       il:"Sarıyer",    emoji:"🌺"},
+  {id:16, name:"Safa Tepesi Sosyal Tesisi",      il:"Sancaktepe", emoji:"🌄"},
+  {id:17, name:"Sultanbeyli Gölet Sosyal Tesisi",il:"Sultanbeyli",emoji:"🦢"},
+];
+
+const grid = document.getElementById('tesis-grid');
+TESISLER_DATA.forEach(t => {
+  grid.innerHTML += `
+    <div class="tesis-page-card">
+      <div class="tpc-emoji">${t.emoji}</div>
+      <div class="tpc-name">${t.name}</div>
+      <div class="tpc-loc">📍 ${t.il}</div>
+      <div class="tpc-btns">
+        <a class="tpc-btn-res" href="https://tesislerrezervasyon.ibb.istanbul/reservation/create/${t.id}" target="_blank">Rezervasyon ↗</a>
+        <a class="tpc-btn-tak" href="index.html">Takip Et 🔔</a>
+      </div>
+    </div>
+  `;
+});
+</script>
+</body>
+</html>

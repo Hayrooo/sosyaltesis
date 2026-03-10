@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="İBB sosyal tesis rezervasyonlarında boşluk çıktığında anında mail ve WhatsApp bildirimi alın. Ücretsiz.">
+<title>Sosyal Tesis Takip — Boşluk Bildirimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">🔔</div>
+    <span class="nav-logo-text">Sosyal Tesis Takip</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link active" href="index.html">Takip</a>
+    <a class="nav-link" href="forum.html">Forum</a>
+    <a class="nav-link" href="tesisler.html">Tesisler</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge"><div class="badge-dot"></div>Aktif — Sürekli İzleniyor</div>
+  <h1>Boşluk çıktığında<br><em>ilk sen haber al</em></h1>
+  <p>İBB sosyal tesislerini sürekli kontrol etmene gerek yok. Yer açıldığı an mail ve WhatsApp ile bildiririm.</p>
+  <div class="how-steps">
+    <div class="how-step"><div class="how-step-n">1</div> E-posta gir</div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><div class="how-step-n">2</div> Tesis seç</div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><div class="how-step-n">3</div> Bildirim al</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n" id="stat-users">—</div><div class="stat-l">Kayıtlı Kullanıcı</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">17</div><div class="stat-l">Tesis İzleniyor</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">5dk</div><div class="stat-l">Kontrol Sıklığı</div></div>
+  </div>
+</div>
+
+<div class="form-wrap">
+  <div class="form-card" id="form-card">
+    <div class="field">
+      <label>E-posta Adresi *</label>
+      <input type="email" id="f-email" placeholder="ornek@gmail.com">
+      <div class="field-note">Boşluk bildirimleri bu adrese gelecek</div>
+      <div class="err" id="err-email">Geçerli bir e-posta adresi girin.</div>
+    </div>
+    <div class="field">
+      <label>WhatsApp <span class="opt-label">(isteğe bağlı)</span></label>
+      <input type="tel" id="f-phone" placeholder="05XX XXX XX XX">
+      <div class="field-note">Girersen WhatsApp ile de bildiririm</div>
+    </div>
+    <div class="field">
+      <div class="field-header">
+        <label style="margin:0">Takip Edilecek Tesisler</label>
+        <span class="sel-badge" id="sel-count">0 / 5</span>
+      </div>
+      <div style="height:10px"></div>
+      <input type="text" class="tesis-search" id="tesis-search" placeholder="🔍  Tesis ara...">
+      <div class="tesis-list" id="tesis-list"></div>
+      <div class="err" id="err-tesis">En az 1 tesis seçin.</div>
+    </div>
+    <div class="field">
+      <label>Bildirim Yöntemi</label>
+      <div class="chip-row">
+        <div class="chip on locked">📧 E-posta (zorunlu)</div>
+        <div class="chip" id="chip-wp" onclick="toggleChip(this)">💬 WhatsApp</div>
+        <div class="chip" id="chip-popup" onclick="toggleChip(this)">🖥️ Ekran bildirimi</div>
+      </div>
+    </div>
+    <div class="kvkk-row" id="kvkk-row" onclick="toggleKvkk()">
+      <div class="kvkk-box">✓</div>
+      <div class="kvkk-text">Bilgilendirme e-postaları almak istiyorum. <a href="gizlilik.html">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.</div>
+    </div>
+    <div class="err" id="err-kvkk">Devam etmek için onay verin.</div>
+    <button class="btn-main" id="btn-sub" onclick="submitForm()">Ücretsiz Takibe Başla →</button>
+    <div class="btn-sub-note">Spam yok &nbsp;·&nbsp; Tek tıkla çıkış &nbsp;·&nbsp; Tamamen ücretsiz</div>
+  </div>
+
+  <div class="success-card" id="success-card">
+    <div class="success-icon">✓</div>
+    <h2>Takip Başladı!</h2>
+    <p>Seçtiğin tesislerde boşluk çıktığında anında haber vereceğim.</p>
+    <div class="detail-box" id="success-detail"></div>
+    <a class="btn-outline" href="forum.html">💬 Foruma katıl — deneyimini paylaş</a>
+    <br><button class="btn-reset" onclick="resetForm()">Yeni kayıt ekle</button>
+  </div>
+</div>
+
+<div id="popup">
+  <div class="popup-row">
+    <div class="popup-icon">🎉</div>
+    <div class="popup-texts">
+      <div class="popup-title">Boşluk Çıktı!</div>
+      <div class="popup-body" id="popup-body">Tesis adı burada görünür</div>
+    </div>
+    <button class="popup-close" onclick="closePopup()">✕</button>
+  </div>
+  <div class="popup-time" id="popup-time">Az önce · Sosyal Tesis Takip</div>
+  <div class="popup-btns">
+    <button class="popup-btn-main" onclick="goRezervasyon()">Hemen Rezervasyon Yap</button>
+    <button class="popup-btn-sec" onclick="closePopup()">Kapat</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-note">Bağımsız bir bildirim servisidir. İBB ile resmi bağlantısı yoktur. &nbsp;·&nbsp; <a href="https://tesislerrezervasyon.ibb.istanbul" target="_blank">Resmi Rezervasyon Sitesi</a></div>
+  <div class="footer-links">
+    <a href="forum.html">Forum</a>
+    <a href="tesisler.html">Tesisler</a>
+    <a href="gizlilik.html">Gizlilik</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+// ── ADMİN AYARLARINI OKU VE UYGULA ──
+(function applySiteSettings(){
+  const s = JSON.parse(localStorage.getItem('site_settings')||'{}');
+
+  // BAKIM MODU
+  if(s.maintOn){
+    document.body.innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F8F6F1;font-family:'Syne',sans-serif;text-align:center;padding:40px">
+        <div>
+          <div style="font-size:56px;margin-bottom:20px">🔧</div>
+          <h1 style="font-family:'Instrument Serif',serif;font-size:36px;font-weight:400;margin-bottom:14px">Bakımdayız</h1>
+          <p style="color:#7C766E;font-size:15px;line-height:1.7;max-width:380px;margin:0 auto">${s.maintText||'Sitemiz kısa süreliğine bakımdadır. En kısa sürede geri döneceğiz.'}</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // DUYURU BANDI
+  if(s.bannerOn && s.bannerText){
+    const banner = document.createElement('div');
+    banner.style.cssText = `background:${s.bannerColor||'#B8821E'};color:white;text-align:center;padding:10px 20px;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;position:sticky;top:58px;z-index:150`;
+    banner.textContent = s.bannerText;
+    document.querySelector('nav').after(banner);
+  }
+
+  // ÖNEMLİ NOT
+  if(s.noteOn && s.noteText){
+    const note = document.createElement('div');
+    note.style.cssText = `background:#FEF3C7;border:1px solid #F59E0B;border-radius:12px;padding:14px 18px;margin:0 auto 24px;max-width:580px;font-family:'Syne',sans-serif`;
+    note.innerHTML = `<div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px">⚠️ ${s.noteTitle||'Önemli Not'}</div><div style="font-size:13px;color:#78350F;line-height:1.6">${s.noteText}</div>`;
+    document.querySelector('.form-wrap').prepend(note);
+  }
+
+  // HERO GÖRSELİ
+  if(s.heroOn && s.heroImg){
+    const hero = document.querySelector('.hero');
+    hero.style.backgroundImage = `url(${s.heroImg})`;
+    hero.style.backgroundSize = 'cover';
+    hero.style.backgroundPosition = 'center';
+    hero.style.borderRadius = '16px';
+    hero.style.position = 'relative';
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:absolute;inset:0;background:rgba(248,246,241,${1-(s.heroOpacity||20)/100});border-radius:16px;z-index:0`;
+    hero.prepend(overlay);
+    hero.style.zIndex = '1';
+  }
+
+  // TEMA RENGİ
+  if(s.themeColor){
+    document.documentElement.style.setProperty('--gold', s.themeColor);
+  }
+
+  // METİNLER
+  if(s.siteTitle) document.title = s.siteTitle + ' — Boşluk Bildirimi';
+  if(s.h1){
+    const h1 = document.querySelector('.hero h1');
+    if(h1) h1.innerHTML = s.h1.replace('ilk sen','<em>ilk sen</em>');
+  }
+  if(s.desc){
+    const p = document.querySelector('.hero p');
+    if(p) p.textContent = s.desc;
+  }
+})();
+</script>
+<script>initIndex();</script>
+</body>
+</html>

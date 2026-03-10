@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Sosyal Tesis Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0F1011;
+  --surface:#161819;
+  --surface2:#1E2022;
+  --surface3:#252729;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --gold:#C49A2C;
+  --gold-dim:rgba(196,154,44,0.1);
+  --gold-border:rgba(196,154,44,0.25);
+  --green:#22A865;
+  --green-dim:rgba(34,168,101,0.1);
+  --green-border:rgba(34,168,101,0.25);
+  --red:#D94F3D;
+  --red-dim:rgba(217,79,61,0.1);
+  --red-border:rgba(217,79,61,0.25);
+  --blue:#3B82F6;
+  --blue-dim:rgba(59,130,246,0.1);
+  --text:#EDEAE4;
+  --muted:#7A756E;
+  --muted2:#4A4742;
+}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+}
+.login-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:20px;padding:44px 40px;width:100%;max-width:380px;
+  box-shadow:0 24px 80px rgba(0,0,0,.5);
+}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.login-logo-icon{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.login-logo-text{font-family:'Instrument Serif',serif;font-size:18px;font-style:italic;color:var(--text)}
+.login-title{font-size:22px;font-weight:700;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.l-field{margin-bottom:16px}
+.l-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px}
+.l-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s}
+.l-input:focus{border-color:var(--gold)}
+.l-input::placeholder{color:var(--muted2)}
+.l-err{font-size:12px;color:var(--red);margin-top:8px;display:none}
+.l-err.show{display:block}
+.btn-login{width:100%;background:var(--gold);color:#0F1011;border:none;border-radius:9px;padding:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .2s}
+.btn-login:hover{background:#E0B83C;transform:translateY(-1px)}
+.login-hint{font-size:11px;color:var(--muted2);text-align:center;margin-top:14px}
+
+/* ── LAYOUT ── */
+#admin-app{display:none;min-height:100vh}
+#admin-app.visible{display:flex}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;flex-shrink:0;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sb-logo{display:flex;align-items:center;gap:9px;padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.sb-logo-icon{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.sb-logo-text{font-family:'Instrument Serif',serif;font-size:15px;font-style:italic}
+.sb-nav{flex:1;padding:12px 10px}
+.sb-section{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);padding:12px 10px 6px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .18s;margin-bottom:2px;user-select:none}
+.sb-item:hover{background:var(--surface2);color:var(--text)}
+.sb-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.sb-item .icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:white;border-radius:100px;padding:1px 7px;font-size:10px;font-weight:700}
+.sb-footer{padding:14px 20px;border-top:1px solid var(--border)}
+.sb-user{font-size:12px;color:var(--muted);margin-bottom:8px}
+.sb-user strong{color:var(--text);display:block}
+.btn-logout{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:8px;font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--red-border);color:var(--red)}
+
+/* MAIN */
+.main-content{flex:1;overflow-y:auto;padding:32px 36px}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.page-title{font-family:'Instrument Serif',serif;font-size:28px;font-weight:400;font-style:italic}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.top-time{font-size:12px;color:var(--muted)}
+
+/* TABS */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+.sc-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.sc-val{font-family:'Instrument Serif',serif;font-size:34px;font-style:italic;color:var(--text);line-height:1}
+.sc-sub{font-size:12px;color:var(--muted);margin-top:5px}
+.sc-gold .sc-val{color:var(--gold)}
+.sc-green .sc-val{color:var(--green)}
+.sc-red .sc-val{color:var(--red)}
+.sc-blue .sc-val{color:var(--blue)}
+
+/* TABLE */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.table-title{font-size:14px;font-weight:700}
+.table-actions{display:flex;gap:8px}
+.tbl-search{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;width:200px;transition:border-color .2s}
+.tbl-search:focus{border-color:var(--gold)}
+.tbl-search::placeholder{color:var(--muted2)}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);padding:10px 20px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--border)}
+td{font-size:13px;padding:12px 20px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.015)}
+.td-email{font-weight:500}
+.td-phone{color:var(--muted);font-size:12px}
+.td-date{color:var(--muted);font-size:12px}
+.tag{display:inline-block;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600}
+.tag-green{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.tag-gold{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.tag-red{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+.tag-blue{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.btn-sm{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--surface2);color:var(--muted);border-radius:6px;padding:5px 10px;cursor:pointer;transition:all .15s}
+.btn-sm:hover{border-color:var(--red-border);color:var(--red)}
+.btn-sm.approve:hover{border-color:var(--green-border);color:var(--green)}
+.empty-state{text-align:center;padding:48px;color:var(--muted);font-size:14px}
+
+/* TESIS STATUS */
+.tesis-status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px}
+.tesis-status-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px}
+.tsc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tsc-dot.dolu{background:var(--red)}
+.tsc-dot.bos{background:var(--green);box-shadow:0 0 8px var(--green)}
+.tsc-dot.kontrol{background:var(--gold);animation:blink2 1s infinite}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.3}}
+.tsc-info{flex:1}
+.tsc-name{font-size:13px;font-weight:600}
+.tsc-status{font-size:11px;margin-top:2px}
+.tsc-status.dolu{color:var(--red)}
+.tsc-status.bos{color:var(--green)}
+.tsc-status.kontrol{color:var(--gold)}
+.tsc-refresh{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;transition:color .2s}
+.tsc-refresh:hover{color:var(--gold)}
+
+/* BILDIRIM */
+.notif-form{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.nf-title{font-size:15px;font-weight:700;margin-bottom:16px}
+.nf-field{margin-bottom:14px}
+.nf-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:7px}
+.nf-input,.nf-textarea,.nf-select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-family:'Syne',sans-serif;font-size:13px;color:var(--text);outline:none;transition:border-color .2s}
+.nf-input:focus,.nf-textarea:focus,.nf-select:focus{border-color:var(--gold)}
+.nf-input::placeholder,.nf-textarea::placeholder{color:var(--muted2)}
+.nf-textarea{resize:vertical;min-height:100px}
+.nf-select option{background:var(--surface2)}
+.btn-send{background:var(--gold);color:#0F1011;border:none;border-radius:9px;padding:12px 24px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-send:hover{background:#E0B83C;transform:translateY(-1px)}
+.send-success{display:none;font-size:13px;color:var(--green);margin-top:10px}
+.send-success.show{display:block}
+
+/* AYARLAR */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px}
+.sc-header{font-size:14px;font-weight:700;margin-bottom:4px}
+.sc-desc{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surface3);border-radius:100px;cursor:pointer;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.3s}
+.toggle input:checked + .toggle-slider{background:var(--green-dim);border:1px solid var(--green-border)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(18px);background:var(--green)}
+.color-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.color-swatch.active{border-color:white;transform:scale(1.1)}
+.anim-preview{background:var(--surface2);border-radius:10px;padding:16px;text-align:center;font-size:13px;color:var(--muted);margin-top:10px}
+.save-settings{background:var(--gold);color:#0F1011;border:none;border-radius:9px;padding:11px 22px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:16px}
+.save-settings:hover{background:#E0B83C}
+.full-card{grid-column:1/-1}
+
+/* FORUM MOD */
+.forum-post-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px}
+.fp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.fp-meta{display:flex;align-items:center;gap:10px;flex:1}
+.fp-avatar{width:32px;height:32px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold);flex-shrink:0}
+.fp-name{font-size:13px;font-weight:600}
+.fp-time{font-size:11px;color:var(--muted2)}
+.fp-msg{font-size:13px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.fp-actions{display:flex;gap:8px}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:500;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:9999;opacity:0;transition:all .3s;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.green{border-color:var(--green-border);color:var(--green)}
+#toast.red{border-color:var(--red-border);color:var(--red)}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main-content{padding:20px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .settings-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🔐</div>
+      <span class="login-logo-text">Sosyal Tesis Takip</span>
+    </div>
+    <div class="login-title">Admin Girişi</div>
+    <div class="login-sub">Devam etmek için giriş yapın.</div>
+    <div class="l-field">
+      <label class="l-label">Kullanıcı Adı</label>
+      <input class="l-input" type="text" id="l-user" placeholder="admin" autocomplete="off">
+    </div>
+    <div class="l-field">
+      <label class="l-label">Şifre</label>
+      <input class="l-input" type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="l-err" id="l-err">Kullanıcı adı veya şifre hatalı.</div>
+    <button class="btn-login" onclick="doLogin()">Giriş Yap →</button>
+    <div class="login-hint">Varsayılan: admin / admin123<br>Şifreyi ayarlardan değiştirebilirsiniz.</div>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ── -->
+<div id="admin-app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🔔</div>
+      <span class="sb-logo-text">Admin Panel</span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Genel</div>
+      <div class="sb-item active" onclick="switchTab('dashboard',this)">
+        <span class="icon">📊</span> Özet
+      </div>
+      <div class="sb-item" onclick="switchTab('users',this)">
+        <span class="icon">👥</span> Kullanıcılar
+      </div>
+      <div class="sb-section">İçerik</div>
+      <div class="sb-item" onclick="switchTab('forum',this)">
+        <span class="icon">💬</span> Forum
+        <span class="sb-badge" id="forum-badge">3</span>
+      </div>
+      <div class="sb-item" onclick="switchTab('tesisler',this)">
+        <span class="icon">🏛️</span> Tesis Durumu
+      </div>
+      <div class="sb-section">Araçlar</div>
+      <div class="sb-item" onclick="switchTab('bildirim',this)">
+        <span class="icon">📧</span> Bildirim Gönder
+      </div>
+      <div class="sb-item" onclick="switchTab('ayarlar',this)">
+        <span class="icon">⚙️</span> Site Ayarları
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user"><span style="font-size:11px;color:var(--muted2)">Giriş yapıldı</span><strong id="sb-username">admin</strong></div>
+      <button class="btn-logout" onclick="doLogout()">Çıkış Yap</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Özet</div>
+      <div class="topbar-right">
+        <div class="top-time" id="top-time"></div>
+        <a href="index.html" target="_blank" style="font-size:12px;color:var(--muted);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px 12px;transition:all .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Siteyi Gör ↗</a>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card sc-gold">
+          <div class="sc-label">Toplam Kullanıcı</div>
+          <div class="sc-val" id="stat-total">0</div>
+          <div class="sc-sub">kayıtlı abona</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="sc-label">Bu Hafta</div>
+          <div class="sc-val" id="stat-week">0</div>
+          <div class="sc-sub">yeni kayıt</div>
+        </div>
+        <div class="stat-card sc-blue">
+          <div class="sc-label">Forum Gönderisi</div>
+          <div class="sc-val" id="stat-posts">0</div>
+          <div class="sc-sub">toplam gönderi</div>
+        </div>
+        <div class="stat-card sc-red">
+          <div class="sc-label">Bekleyen Moderasyon</div>
+          <div class="sc-val" id="stat-pending">0</div>
+          <div class="sc-sub">gönderi bekliyor</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Son Kayıtlar</div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>E-posta</th><th>Tesisler</th><th>Bildirim</th><th>Tarih</th>
+          </tr></thead>
+          <tbody id="dash-recent"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="tab-content" id="tab-users">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Kayıtlı Kullanıcılar</div>
+          <div class="table-actions">
+            <input class="tbl-search" placeholder="E-posta ara..." oninput="filterUsers(this.value)">
+            <button class="btn-sm approve" onclick="exportCSV()">📥 CSV İndir</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>E-posta</th><th>WhatsApp</th><th>Takip</th><th>Bildirim</th><th>Tarih</th><th></th>
+          </tr></thead>
+          <tbody id="users-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FORUM -->
+    <div class="tab-content" id="tab-forum">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:600">Forum Gönderileri</div>
+        <div style="display:flex;gap:8px">
+          <select id="forum-filter" onchange="renderForumMod()" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none">
+            <option value="hepsi">Tümü</option>
+            <option value="bekliyor">Bekleyenler</option>
+            <option value="onaylandi">Onaylananlar</option>
+          </select>
+        </div>
+      </div>
+      <div id="forum-mod-list"></div>
+    </div>
+
+    <!-- TESİSLER -->
+    <div class="tab-content" id="tab-tesisler">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:600">Tesis Durumları</div>
+        <button class="btn-sm approve" onclick="refreshAllStatus()">🔄 Tümünü Yenile</button>
+      </div>
+      <div class="tesis-status-grid" id="tesis-status-grid"></div>
+    </div>
+
+    <!-- BİLDİRİM -->
+    <div class="tab-content" id="tab-bildirim">
+      <div class="notif-form">
+        <div class="nf-title">Manuel Bildirim Gönder</div>
+        <div class="nf-field">
+          <label class="nf-label">Alıcılar</label>
+          <select class="nf-select" id="notif-to">
+            <option value="all">Tüm kullanıcılar</option>
+            <option value="tesis">Belirli tesis takipçileri</option>
+            <option value="single">Tek kullanıcı (e-posta)</option>
+          </select>
+        </div>
+        <div class="nf-field" id="notif-tesis-field" style="display:none">
+          <label class="nf-label">Tesis Seç</label>
+          <select class="nf-select" id="notif-tesis-sel">
+            <option value="">Tesis seçin...</option>
+          </select>
+        </div>
+        <div class="nf-field" id="notif-email-field" style="display:none">
+          <label class="nf-label">E-posta Adresi</label>
+          <input class="nf-input" type="email" id="notif-email-val" placeholder="kullanici@gmail.com">
+        </div>
+        <div class="nf-field">
+          <label class="nf-label">Konu</label>
+          <input class="nf-input" id="notif-subject" placeholder="🎉 Boşluk Çıktı! — Tesis Adı" value="🎉 Boşluk Çıktı!">
+        </div>
+        <div class="nf-field">
+          <label class="nf-label">Mesaj</label>
+          <textarea class="nf-textarea" id="notif-msg" placeholder="Kullanıcılara gönderilecek mesaj...">Takip ettiğiniz tesiste boşluk çıktı! Hemen rezervasyon yapın.
+
+Rezervasyon için: https://tesislerrezervasyon.ibb.istanbul</textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button class="btn-send" onclick="sendNotification()">📧 Bildirimi Gönder</button>
+          <div class="send-success" id="send-success">✓ Bildirim gönderildi!</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Gönderim Geçmişi</div></div>
+        <table>
+          <thead><tr><th>Tarih</th><th>Alıcılar</th><th>Konu</th><th>Durum</th></tr></thead>
+          <tbody id="notif-history"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AYARLAR -->
+    <div class="tab-content" id="tab-ayarlar">
+
+      <!-- CANLI ÖNİZLEME BANNER -->
+      <div style="background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">✏️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold)">Site Düzenleyici</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Burada yaptığın değişiklikler kaydedilince ana sayfaya <strong style="color:var(--text)">anında yansır</strong>. Kod bilmene gerek yok.</div>
+        </div>
+        <a href="index.html" target="_blank" style="margin-left:auto;font-size:12px;color:var(--gold);text-decoration:none;background:var(--surface);border:1px solid var(--gold-border);border-radius:7px;padding:7px 14px;white-space:nowrap;flex-shrink:0">Siteyi Gör ↗</a>
+      </div>
+
+      <div class="settings-grid">
+
+        <!-- DUYURU BANDI -->
+        <div class="settings-card full-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="sc-header">📢 Duyuru Bandı</div>
+            <label class="toggle" style="margin:0"><input type="checkbox" id="t-banner" onchange="livePreview()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="sc-desc">Ana sayfanın en üstünde görünen renkli şerit. Açıp kapatabilirsin.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="nf-field" style="margin:0">
+              <label class="nf-label">Duyuru Metni</label>
+              <input class="nf-input" id="s-banner-text" placeholder="🌙 Hayırlı Ramazanlar! Tüm tesisler aktif izleniyor." oninput="livePreview()">
+            </div>
+            <div class="nf-field" style="margin:0">
+              <label class="nf-label">Bant Rengi</label>
+              <div style="display:flex;gap:8px;margin-top:2px">
+                <div class="color-swatch active" style="background:#B8821E;width:28px;height:28px" data-group="banner" data-color="#B8821E" onclick="selectGroupColor(this,'banner')"></div>
+                <div class="color-swatch" style="background:#1A7A4A;width:28px;height:28px" data-group="banner" data-color="#1A7A4A" onclick="selectGroupColor(this,'banner')"></div>
+                <div class="color-swatch" style="background:#D94F3D;width:28px;height:28px" data-group="banner" data-color="#D94F3D" onclick="selectGroupColor(this,'banner')"></div>
+                <div class="color-swatch" style="background:#2563EB;width:28px;height:28px" data-group="banner" data-color="#2563EB" onclick="selectGroupColor(this,'banner')"></div>
+                <div class="color-swatch" style="background:#374151;width:28px;height:28px" data-group="banner" data-color="#374151" onclick="selectGroupColor(this,'banner')"></div>
+              </div>
+            </div>
+          </div>
+          <!-- CANLI ÖNİZLEME -->
+          <div id="banner-preview" style="display:none;margin-top:14px;border-radius:8px;padding:10px 16px;text-align:center;font-size:13px;font-weight:600;color:white;background:#B8821E;transition:background .3s">
+            🌙 Önizleme burada görünür
+          </div>
+          <button class="save-settings" style="margin-top:16px" onclick="saveSection('banner')">💾 Kaydet & Yayınla</button>
+        </div>
+
+        <!-- ÖNEMLİ NOT KUTUSU -->
+        <div class="settings-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="sc-header">⚠️ Önemli Not Kutusu</div>
+            <label class="toggle" style="margin:0"><input type="checkbox" id="t-note"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="sc-desc">Sarı uyarı kutusu. Geçici duyurular için kullan (bakım, gecikme vb.)</div>
+          <div class="nf-field">
+            <label class="nf-label">Not Başlığı</label>
+            <input class="nf-input" id="s-note-title" placeholder="Sistem Bildirimi">
+          </div>
+          <div class="nf-field">
+            <label class="nf-label">Not Metni</label>
+            <textarea class="nf-textarea" id="s-note-text" rows="3" placeholder="Bildirimler geçici olarak yavaşlayabilir. En kısa sürede normale döneceğiz." style="min-height:80px"></textarea>
+          </div>
+          <button class="save-settings" onclick="saveSection('note')">💾 Kaydet & Yayınla</button>
+        </div>
+
+        <!-- HERO GÖRSELİ -->
+        <div class="settings-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="sc-header">🖼️ Kapak Görseli</div>
+            <label class="toggle" style="margin:0"><input type="checkbox" id="t-hero-img"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="sc-desc">Hero alanına arka plan görseli ekle. Görselin URL'sini gir.</div>
+          <div class="nf-field">
+            <label class="nf-label">Görsel URL</label>
+            <input class="nf-input" id="s-hero-img" placeholder="https://... (unsplash.com vb.)" oninput="previewHeroImg()">
+          </div>
+          <div id="hero-img-preview" style="display:none;margin-top:10px;border-radius:10px;overflow:hidden;height:120px;background-size:cover;background-position:center;border:1px solid var(--border)"></div>
+          <div class="nf-field" style="margin-top:12px">
+            <label class="nf-label">Görsel Opaklığı</label>
+            <input type="range" id="s-hero-opacity" min="0" max="100" value="20" style="width:100%;accent-color:var(--gold)" oninput="document.getElementById('opacity-val').textContent=this.value+'%'">
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Opaklık: <span id="opacity-val">20%</span></div>
+          </div>
+          <button class="save-settings" onclick="saveSection('heroimg')">💾 Kaydet & Yayınla</button>
+        </div>
+
+        <!-- BAKIM MODU -->
+        <div class="settings-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="sc-header">🔧 Bakım Modu</div>
+            <label class="toggle" style="margin:0"><input type="checkbox" id="t-maintenance" onchange="maintenanceWarning(this)"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="sc-desc">Açılınca ziyaretçiler siteye giremez, sadece "Bakımdayız" sayfası görür.</div>
+          <div class="nf-field">
+            <label class="nf-label">Bakım Mesajı</label>
+            <textarea class="nf-textarea" id="s-maint-text" rows="3" style="min-height:80px">Sitemiz kısa süreliğine bakımdadır. En kısa sürede geri döneceğiz. 🔧</textarea>
+          </div>
+          <div style="background:var(--red-dim);border:1px solid var(--red-border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-top:8px" id="maint-warning" style="display:none">
+            ⚠️ Bakım modu açıkken tüm ziyaretçiler siteye erişemez!
+          </div>
+          <button class="save-settings" onclick="saveSection('maintenance')">💾 Kaydet & Uygula</button>
+        </div>
+
+        <!-- SİTE BİLGİLERİ -->
+        <div class="settings-card">
+          <div class="sc-header">📝 Site Metinleri</div>
+          <div class="sc-desc">Ana sayfadaki başlık ve açıklama metinleri</div>
+          <div class="nf-field">
+            <label class="nf-label">Site Başlığı</label>
+            <input class="nf-input" id="s-title" value="Sosyal Tesis Takip">
+          </div>
+          <div class="nf-field">
+            <label class="nf-label">Ana Başlık (H1)</label>
+            <input class="nf-input" id="s-h1" value="Boşluk çıktığında ilk sen haber al">
+          </div>
+          <div class="nf-field">
+            <label class="nf-label">Alt Açıklama</label>
+            <textarea class="nf-textarea" id="s-desc" rows="2" style="min-height:70px">İBB sosyal tesislerini sürekli kontrol etmene gerek yok. Yer açıldığı an mail ve WhatsApp ile bildiririm.</textarea>
+          </div>
+          <button class="save-settings" onclick="saveSection('texts')">💾 Kaydet & Yayınla</button>
+        </div>
+
+        <!-- GÖRÜNÜM -->
+        <div class="settings-card">
+          <div class="sc-header">🎨 Renk & Görünüm</div>
+          <div class="sc-desc">Site genelinde kullanılan vurgu rengi</div>
+          <label class="nf-label">Vurgu Rengi</label>
+          <div class="color-row">
+            <div class="color-swatch active" style="background:#B8821E" data-group="theme" data-color="#B8821E" onclick="selectGroupColor(this,'theme')"></div>
+            <div class="color-swatch" style="background:#1A7A4A" data-group="theme" data-color="#1A7A4A" onclick="selectGroupColor(this,'theme')"></div>
+            <div class="color-swatch" style="background:#2563EB" data-group="theme" data-color="#2563EB" onclick="selectGroupColor(this,'theme')"></div>
+            <div class="color-swatch" style="background:#9333EA" data-group="theme" data-color="#9333EA" onclick="selectGroupColor(this,'theme')"></div>
+            <div class="color-swatch" style="background:#D94F3D" data-group="theme" data-color="#D94F3D" onclick="selectGroupColor(this,'theme')"></div>
+            <div class="color-swatch" style="background:#0891B2" data-group="theme" data-color="#0891B2" onclick="selectGroupColor(this,'theme')"></div>
+          </div>
+          <div style="height:14px"></div>
+          <label class="nf-label">Max Tesis Seçimi</label>
+          <select class="nf-select" id="s-maxtesis">
+            <option value="3">3 tesis</option>
+            <option value="5" selected>5 tesis</option>
+            <option value="10">10 tesis</option>
+          </select>
+          <button class="save-settings" style="margin-top:16px" onclick="saveSection('theme')">💾 Kaydet & Yayınla</button>
+        </div>
+
+        <!-- ADMİN ŞİFRE -->
+        <div class="settings-card">
+          <div class="sc-header">🔐 Admin Şifresi</div>
+          <div class="sc-desc">Giriş bilgilerini buradan değiştir</div>
+          <div class="nf-field">
+            <label class="nf-label">Kullanıcı Adı</label>
+            <input class="nf-input" id="s-adminuser" value="admin">
+          </div>
+          <div class="nf-field">
+            <label class="nf-label">Yeni Şifre</label>
+            <input class="nf-input" type="password" id="s-adminpass" placeholder="Yeni şifre">
+          </div>
+          <div class="nf-field">
+            <label class="nf-label">Şifre Tekrar</label>
+            <input class="nf-input" type="password" id="s-adminpass2" placeholder="Tekrar gir">
+          </div>
+          <button class="save-settings" onclick="saveSection('admin')">💾 Şifreyi Güncelle</button>
+        </div>
+
+        <!-- BİLDİRİM AYARLARI -->
+        <div class="settings-card">
+          <div class="sc-header">🔔 Bildirim Ayarları</div>
+          <div class="sc-desc">Hangi kanallardan bildirim gönderilsin</div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Mail Bildirimleri</div><div class="toggle-desc">Boşluk çıkınca mail gönder</div></div>
+            <label class="toggle"><input type="checkbox" id="t-mail" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">WhatsApp</div><div class="toggle-desc">Twilio üzerinden gönder</div></div>
+            <label class="toggle"><input type="checkbox" id="t-wp"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Ekran Pop-up</div><div class="toggle-desc">Tarayıcıda popup göster</div></div>
+            <label class="toggle"><input type="checkbox" id="t-popup" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Forum Moderasyonu</div><div class="toggle-desc">Gönderileri önce onayla</div></div>
+            <label class="toggle"><input type="checkbox" id="t-mod"><span class="toggle-slider"></span></label>
+          </div>
+          <button class="save-settings" onclick="saveSection('notif')">💾 Kaydet</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /admin-app -->
+
+<div id="toast"></div>
+
+<script>
+// ── AUTH ──
+const CREDS_KEY = 'admin_creds';
+function getCreds(){ return JSON.parse(localStorage.getItem(CREDS_KEY)||'{"user":"admin","pass":"admin123"}'); }
+
+function doLogin(){
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const c = getCreds();
+  if(u===c.user && p===c.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-app').classList.add('visible');
+    document.getElementById('sb-username').textContent = u;
+    initApp();
+  } else {
+    document.getElementById('l-err').classList.add('show');
+    document.getElementById('l-pass').value='';
+  }
+}
+
+function doLogout(){
+  document.getElementById('admin-app').classList.remove('visible');
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-pass').value='';
+  document.getElementById('l-err').classList.remove('show');
+}
+
+// ── TABS ──
+const TAB_TITLES = {dashboard:'Özet',users:'Kullanıcılar',forum:'Forum Moderasyonu',tesisler:'Tesis Durumları',bildirim:'Bildirim Gönder',ayarlar:'Site Ayarları'};
+function switchTab(id, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('page-title').textContent = TAB_TITLES[id];
+  if(id==='users') renderUsers();
+  if(id==='forum') renderForumMod();
+  if(id==='tesisler') renderTesisStatus();
+  if(id==='bildirim') renderNotifHistory();
+}
+
+// ── CLOCK ──
+function updateClock(){
+  document.getElementById('top-time').textContent = new Date().toLocaleString('tr-TR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 30000);
+updateClock();
+
+// ── DEMO DATA ──
+const DEMO_USERS = [
+  {email:'fatma.ozturk@gmail.com', phone:'0532 111 22 33', tesisler:[1,8,15], wp:true, popup:true, tarih:'2026-03-08T09:21:00'},
+  {email:'ahmet.k@hotmail.com', phone:'', tesisler:[5,10], wp:false, popup:false, tarih:'2026-03-07T14:05:00'},
+  {email:'zeynep.t@gmail.com', phone:'0545 333 44 55', tesisler:[3,8,12,15], wp:true, popup:true, tarih:'2026-03-07T11:33:00'},
+  {email:'mehmet.a@gmail.com', phone:'', tesisler:[2], wp:false, popup:false, tarih:'2026-03-06T16:47:00'},
+  {email:'ayse.yilmaz@gmail.com', phone:'0555 777 88 99', tesisler:[8,11,13], wp:true, popup:false, tarih:'2026-03-05T08:15:00'},
+];
+const TESIS_NAMES = ['Altınboynuz','Beykoz Sahil','Beykoz Koru','Cihangir','Çamlıca','Dragos','Fethipaşa','Florya','Gözdağı','Haliç','İstinye','Kasımpaşa','K.Çamlıca','Küçükçekmece','Pembe Köşk','Safa Tepesi','Sultanbeyli Gölet'];
+
+function getUsers(){
+  const stored = JSON.parse(localStorage.getItem('subs')||'[]');
+  return [...DEMO_USERS, ...stored];
+}
+
+// ── DASHBOARD ──
+function initDash(){
+  const users = getUsers();
+  document.getElementById('stat-total').textContent = users.length;
+  const week = users.filter(u=>{ const d=new Date(u.tarih); return (Date.now()-d)<7*86400000; }).length;
+  document.getElementById('stat-week').textContent = week;
+  const forumPosts = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+  document.getElementById('stat-posts').textContent = forumPosts.length + 4;
+  const pending = forumPosts.filter(p=>!p.approved).length;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('forum-badge').textContent = pending || '';
+  if(!pending) document.getElementById('forum-badge').style.display='none';
+
+  const tbody = document.getElementById('dash-recent');
+  tbody.innerHTML = '';
+  users.slice(0,5).forEach(u=>{
+    const names = u.tesisler.slice(0,2).map(id=>TESIS_NAMES[id-1]).join(', ') + (u.tesisler.length>2?' +'+( u.tesisler.length-2):'');
+    tbody.innerHTML += `<tr>
+      <td class="td-email">${u.email}</td>
+      <td><span class="tag tag-gold">${names}</span></td>
+      <td>${u.wp?'<span class="tag tag-green">Mail+WA</span>':'<span class="tag tag-blue">Mail</span>'}</td>
+      <td class="td-date">${new Date(u.tarih).toLocaleDateString('tr-TR')}</td>
+    </tr>`;
+  });
+}
+
+// ── USERS ──
+let userFilter = '';
+function renderUsers(q=''){
+  const users = getUsers().filter(u=>!q || u.email.toLowerCase().includes(q.toLowerCase()));
+  const tbody = document.getElementById('users-table');
+  if(!users.length){ tbody.innerHTML='<tr><td colspan="6"><div class="empty-state">Kullanıcı bulunamadı</div></td></tr>'; return; }
+  tbody.innerHTML = users.map((u,i)=>{
+    const names = u.tesisler.map(id=>TESIS_NAMES[id-1]).join(', ');
+    return `<tr>
+      <td class="td-email">${u.email}</td>
+      <td class="td-phone">${u.phone||'—'}</td>
+      <td style="font-size:12px;max-width:180px">${names}</td>
+      <td>${u.wp?'<span class="tag tag-green">Mail+WA</span>':'<span class="tag tag-blue">Mail</span>'}</td>
+      <td class="td-date">${new Date(u.tarih).toLocaleDateString('tr-TR')}</td>
+      <td><button class="btn-sm" onclick="deleteUser(${i})">Sil</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(q){ renderUsers(q); }
+
+function deleteUser(idx){
+  if(!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
+  const subs = JSON.parse(localStorage.getItem('subs')||'[]');
+  const demoLen = DEMO_USERS.length;
+  if(idx >= demoLen){ subs.splice(idx-demoLen,1); localStorage.setItem('subs',JSON.stringify(subs)); }
+  renderUsers(); toast('Kullanıcı silindi','red');
+}
+
+function exportCSV(){
+  const users = getUsers();
+  const rows = [['E-posta','Telefon','Tesisler','WhatsApp','Tarih']];
+  users.forEach(u=>rows.push([u.email, u.phone||'', u.tesisler.map(id=>TESIS_NAMES[id-1]).join(' | '), u.wp?'Evet':'Hayır', u.tarih]));
+  const csv = rows.map(r=>r.map(c=>'"'+c+'"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download = 'kullanicilar.csv';
+  a.click();
+  toast('CSV indirildi ✓','green');
+}
+
+// ── FORUM MOD ──
+const SEED_FORUM = [
+  {id:'s1',name:'Ahmet K.',topic:'ipucu',msg:'Sabah 08:00-09:00 arası en çok iptal oluyor.',likes:14,time:Date.now()-3600000*2,approved:true},
+  {id:'s2',name:'Fatma S.',topic:'yorum',msg:'Florya tesisini denedik, manzarası inanılmaz.',likes:9,time:Date.now()-3600000*5,approved:true},
+  {id:'s3',name:'Mehmet A.',topic:'soru',msg:'Bildirim gelince ne kadar süre var?',likes:3,time:Date.now()-3600000*8,approved:false},
+  {id:'s4',name:'Zeynep T.',topic:'genel',msg:'Bu sistemi kurana teşekkürler!',likes:22,time:Date.now()-86400000,approved:false},
+];
+
+function getAllForumPosts(){
+  const user = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+  return [...SEED_FORUM,...user];
+}
+
+function renderForumMod(){
+  const filter = document.getElementById('forum-filter').value;
+  let posts = getAllForumPosts();
+  if(filter==='bekliyor') posts = posts.filter(p=>!p.approved);
+  if(filter==='onaylandi') posts = posts.filter(p=>p.approved);
+  const cont = document.getElementById('forum-mod-list');
+  if(!posts.length){ cont.innerHTML='<div class="empty-state">Gönderi bulunamadı</div>'; return; }
+  cont.innerHTML = posts.map(p=>`
+    <div class="forum-post-card">
+      <div class="fp-top">
+        <div class="fp-meta">
+          <div class="fp-avatar">${(p.name||'?')[0].toUpperCase()}</div>
+          <div><div class="fp-name">${p.name||'Anonim'}</div><div class="fp-time">${timeAgo(p.time)}</div></div>
+          <span class="tag ${p.approved?'tag-green':'tag-gold'}" style="margin-left:8px">${p.approved?'Onaylı':'Bekliyor'}</span>
+        </div>
+      </div>
+      <div class="fp-msg">${p.msg}</div>
+      <div class="fp-actions">
+        ${!p.approved?`<button class="btn-sm approve" onclick="approvePost('${p.id}')">✓ Onayla</button>`:''}
+        <button class="btn-sm" onclick="deletePost('${p.id}')">✕ Sil</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function approvePost(id){
+  const posts = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+  const p = posts.find(x=>x.id===id);
+  if(p){ p.approved=true; localStorage.setItem('forum_posts',JSON.stringify(posts)); }
+  const seed = SEED_FORUM.find(x=>x.id===id);
+  if(seed) seed.approved=true;
+  renderForumMod(); toast('Gönderi onaylandı ✓','green');
+}
+
+function deletePost(id){
+  if(!confirm('Bu gönderiyi silmek istediğinize emin misiniz?')) return;
+  const posts = JSON.parse(localStorage.getItem('forum_posts')||'[]');
+  const idx = posts.findIndex(x=>x.id===id);
+  if(idx>-1){ posts.splice(idx,1); localStorage.setItem('forum_posts',JSON.stringify(posts)); }
+  renderForumMod(); toast('Gönderi silindi','red');
+}
+
+function timeAgo(ts){
+  const diff=Date.now()-ts,m=Math.floor(diff/60000),h=Math.floor(diff/3600000),d=Math.floor(diff/86400000);
+  if(m<1)return'Az önce';if(m<60)return m+' dk önce';if(h<24)return h+' sa önce';return d+' gün önce';
+}
+
+// ── TESİS DURUMU ──
+const TESIS_LIST = [
+  {id:1,name:'Altınboynuz Sosyal Tesisi'},{id:2,name:'Beykoz Sahil Sosyal Tesisi'},{id:3,name:'Beykoz Koru Sosyal Tesisi'},
+  {id:4,name:'Cihangir Sosyal Tesisi'},{id:5,name:'Çamlıca Sosyal Tesisi'},{id:6,name:'Dragos Sosyal Tesisi'},
+  {id:7,name:'Fethipaşa Sosyal Tesisleri'},{id:8,name:'Florya Sosyal Tesisleri'},{id:9,name:'Gözdağı Sosyal Tesisi'},
+  {id:10,name:'Haliç Sosyal Tesisi'},{id:11,name:'İstinye Sosyal Tesisi'},{id:12,name:'Kasımpaşa Sosyal Tesisi'},
+  {id:13,name:'Küçük Çamlıca Sosyal Tesisi'},{id:14,name:'Küçükçekmece Sosyal Tesisi'},{id:15,name:'Pembe Köşk Sosyal Tesisi'},
+  {id:16,name:'Safa Tepesi Sosyal Tesisi'},{id:17,name:'Sultanbeyli Gölet Sosyal Tesisi'},
+];
+
+let tesisStatuses = {};
+
+function renderTesisStatus(){
+  const grid = document.getElementById('tesis-status-grid');
+  grid.innerHTML = TESIS_LIST.map(t=>{
+    const s = tesisStatuses[t.id] || 'dolu';
+    const label = s==='bos'?'Boşluk Var!':s==='kontrol'?'Kontrol ediliyor...':'Dolu';
+    return `<div class="tesis-status-card">
+      <div class="tsc-dot ${s}"></div>
+      <div class="tsc-info">
+        <div class="tsc-name">${t.name}</div>
+        <div class="tsc-status ${s}">${label}</div>
+      </div>
+      <button class="tsc-refresh" onclick="checkTesis(${t.id})" title="Kontrol et">🔄</button>
+    </div>`;
+  }).join('');
+}
+
+function checkTesis(id){
+  tesisStatuses[id]='kontrol';
+  renderTesisStatus();
+  setTimeout(()=>{
+    tesisStatuses[id] = Math.random()>0.85 ? 'bos' : 'dolu';
+    renderTesisStatus();
+    if(tesisStatuses[id]==='bos') toast('🎉 '+TESIS_LIST.find(t=>t.id===id).name+' — boşluk bulundu!','green');
+  }, 1500+Math.random()*1000);
+}
+
+function refreshAllStatus(){
+  TESIS_LIST.forEach(t=>{ tesisStatuses[t.id]='kontrol'; });
+  renderTesisStatus();
+  toast('Tüm tesisler kontrol ediliyor...','');
+  TESIS_LIST.forEach((t,i)=>{
+    setTimeout(()=>{
+      tesisStatuses[t.id] = Math.random()>0.85 ? 'bos' : 'dolu';
+      renderTesisStatus();
+    }, 1000+i*300);
+  });
+}
+
+// ── BİLDİRİM ──
+document.getElementById('notif-to').addEventListener('change', function(){
+  document.getElementById('notif-tesis-field').style.display = this.value==='tesis'?'block':'none';
+  document.getElementById('notif-email-field').style.display = this.value==='single'?'block':'none';
+});
+
+function initNotifSelect(){
+  const sel = document.getElementById('notif-tesis-sel');
+  TESIS_LIST.forEach(t=>{ sel.innerHTML+=`<option value="${t.id}">${t.name}</option>`; });
+}
+
+let notifHistory = [];
+
+function sendNotification(){
+  const to = document.getElementById('notif-to').value;
+  const subject = document.getElementById('notif-subject').value.trim();
+  const msg = document.getElementById('notif-msg').value.trim();
+  if(!subject||!msg){ toast('Konu ve mesaj boş olamaz','red'); return; }
+  const toLabel = to==='all'?'Tüm kullanıcılar':to==='tesis'?TESIS_LIST.find(t=>t.id==document.getElementById('notif-tesis-sel').value)?.name||'Tesis':document.getElementById('notif-email-val').value;
+  notifHistory.unshift({tarih:new Date().toISOString(),to:toLabel,subject,durum:'Gönderildi'});
+  renderNotifHistory();
+  document.getElementById('send-success').classList.add('show');
+  setTimeout(()=>document.getElementById('send-success').classList.remove('show'),3000);
+  toast('Bildirim gönderildi ✓','green');
+}
+
+function renderNotifHistory(){
+  const tbody = document.getElementById('notif-history');
+  if(!notifHistory.length){ tbody.innerHTML='<tr><td colspan="4"><div class="empty-state">Henüz gönderim yapılmadı</div></td></tr>'; return; }
+  tbody.innerHTML = notifHistory.map(n=>`<tr>
+    <td class="td-date">${new Date(n.tarih).toLocaleString('tr-TR')}</td>
+    <td style="font-size:13px">${n.to}</td>
+    <td style="font-size:13px">${n.subject}</td>
+    <td><span class="tag tag-green">${n.durum}</span></td>
+  </tr>`).join('');
+}
+
+// ── AYARLAR ──
+const SITE_SETTINGS_KEY = 'site_settings';
+
+function getSiteSettings(){
+  return JSON.parse(localStorage.getItem(SITE_SETTINGS_KEY)||'{}');
+}
+
+function loadSettingsToForm(){
+  const s = getSiteSettings();
+  if(s.bannerText) document.getElementById('s-banner-text').value = s.bannerText;
+  if(s.bannerOn) document.getElementById('t-banner').checked = true;
+  if(s.noteTitle) document.getElementById('s-note-title').value = s.noteTitle;
+  if(s.noteText) document.getElementById('s-note-text').value = s.noteText;
+  if(s.noteOn) document.getElementById('t-note').checked = true;
+  if(s.heroImg) document.getElementById('s-hero-img').value = s.heroImg;
+  if(s.heroOn) document.getElementById('t-hero-img').checked = true;
+  if(s.maintText) document.getElementById('s-maint-text').value = s.maintText;
+  if(s.maintOn) document.getElementById('t-maintenance').checked = true;
+  if(s.siteTitle) document.getElementById('s-title').value = s.siteTitle;
+  if(s.h1) document.getElementById('s-h1').value = s.h1;
+  if(s.desc) document.getElementById('s-desc').value = s.desc;
+}
+
+function saveSection(type){
+  const s = getSiteSettings();
+
+  if(type==='banner'){
+    s.bannerOn = document.getElementById('t-banner').checked;
+    s.bannerText = document.getElementById('s-banner-text').value.trim();
+    s.bannerColor = document.querySelector('[data-group="banner"].active')?.dataset.color || '#B8821E';
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Duyuru bandı kaydedildi ✓','green'); return;
+  }
+  if(type==='note'){
+    s.noteOn = document.getElementById('t-note').checked;
+    s.noteTitle = document.getElementById('s-note-title').value.trim();
+    s.noteText = document.getElementById('s-note-text').value.trim();
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Not kutusu kaydedildi ✓','green'); return;
+  }
+  if(type==='heroimg'){
+    s.heroOn = document.getElementById('t-hero-img').checked;
+    s.heroImg = document.getElementById('s-hero-img').value.trim();
+    s.heroOpacity = document.getElementById('s-hero-opacity').value;
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Kapak görseli kaydedildi ✓','green'); return;
+  }
+  if(type==='maintenance'){
+    s.maintOn = document.getElementById('t-maintenance').checked;
+    s.maintText = document.getElementById('s-maint-text').value.trim();
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast(s.maintOn ? '⚠️ Bakım modu AKTİF edildi!' : 'Bakım modu kapatıldı','green'); return;
+  }
+  if(type==='texts'){
+    s.siteTitle = document.getElementById('s-title').value.trim();
+    s.h1 = document.getElementById('s-h1').value.trim();
+    s.desc = document.getElementById('s-desc').value.trim();
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Site metinleri kaydedildi ✓','green'); return;
+  }
+  if(type==='theme'){
+    s.themeColor = document.querySelector('[data-group="theme"].active')?.dataset.color || '#B8821E';
+    s.maxTesis = document.getElementById('s-maxtesis').value;
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Görünüm ayarları kaydedildi ✓','green'); return;
+  }
+  if(type==='admin'){
+    const user = document.getElementById('s-adminuser').value.trim();
+    const pass = document.getElementById('s-adminpass').value;
+    const pass2 = document.getElementById('s-adminpass2').value;
+    if(!user){ toast('Kullanıcı adı boş olamaz','red'); return; }
+    if(pass && pass!==pass2){ toast('Şifreler eşleşmiyor','red'); return; }
+    const creds = getCreds();
+    localStorage.setItem(CREDS_KEY, JSON.stringify({user, pass: pass||creds.pass}));
+    document.getElementById('s-adminpass').value='';
+    document.getElementById('s-adminpass2').value='';
+    toast('Giriş bilgileri güncellendi ✓','green'); return;
+  }
+  if(type==='notif'){
+    s.mailOn = document.getElementById('t-mail').checked;
+    s.wpOn = document.getElementById('t-wp').checked;
+    s.popupOn = document.getElementById('t-popup').checked;
+    s.modOn = document.getElementById('t-mod').checked;
+    localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+    toast('Bildirim ayarları kaydedildi ✓','green'); return;
+  }
+}
+
+function selectGroupColor(el, group){
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  if(group==='banner') livePreview();
+}
+
+function livePreview(){
+  const text = document.getElementById('s-banner-text').value || '🌙 Önizleme burada görünür';
+  const color = document.querySelector('[data-group="banner"].active')?.dataset.color || '#B8821E';
+  const preview = document.getElementById('banner-preview');
+  preview.style.display = 'block';
+  preview.style.background = color;
+  preview.textContent = text;
+}
+
+function previewHeroImg(){
+  const url = document.getElementById('s-hero-img').value.trim();
+  const prev = document.getElementById('hero-img-preview');
+  if(url){ prev.style.display='block'; prev.style.backgroundImage=`url(${url})`; }
+  else { prev.style.display='none'; }
+}
+
+function maintenanceWarning(el){
+  document.getElementById('maint-warning').style.display = el.checked ? 'block' : 'none';
+}
+
+// ── TOAST ──
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show'+(type?' '+type:'');
+  setTimeout(()=>t.className='',3000);
+}
+
+// ── INIT ──
+function initApp(){
+  initDash();
+  initNotifSelect();
+  renderTesisStatus();
+  loadSettingsToForm();
+}
+
+// Enter ile giriş
+document.getElementById('l-user').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('l-pass').focus(); });
+</script>
+</body>
+</html>

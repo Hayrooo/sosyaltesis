@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forum — Sosyal Tesis Takip</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">🔔</div>
+    <span class="nav-logo-text">Sosyal Tesis Takip</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Takip</a>
+    <a class="nav-link active" href="forum.html">Forum</a>
+    <a class="nav-link" href="tesisler.html">Tesisler</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1 style="font-family:'Instrument Serif',serif;font-size:clamp(28px,4vw,42px);font-weight:400;margin-bottom:10px">
+      Topluluk <em style="font-style:italic;color:var(--gold)">Forumu</em>
+    </h1>
+    <p style="color:var(--muted);font-size:14px;line-height:1.7">Deneyimlerini paylaş, soru sor, diğer kullanıcılarla sohbet et.</p>
+  </div>
+
+  <!-- YENİ MESAJ -->
+  <div class="form-card" id="post-form" style="margin-bottom:28px">
+    <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;letter-spacing:1px;text-transform:uppercase">Yeni Gönderi</div>
+    <div class="field">
+      <label>Takma Ad</label>
+      <input type="text" id="p-name" placeholder="Anonim Kullanıcı" maxlength="30">
+    </div>
+    <div class="field">
+      <label>Konu</label>
+      <div class="chip-row" style="margin-bottom:0">
+        <div class="chip topic-chip on" data-topic="genel" onclick="selectTopic(this)">💬 Genel</div>
+        <div class="chip topic-chip" data-topic="ipucu" onclick="selectTopic(this)">💡 İpucu</div>
+        <div class="chip topic-chip" data-topic="yorum" onclick="selectTopic(this)">⭐ Tesis Yorumu</div>
+        <div class="chip topic-chip" data-topic="soru" onclick="selectTopic(this)">❓ Soru</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Mesajın</label>
+      <textarea id="p-msg" placeholder="Deneyimini, ipucunu ya da sorunuzu paylaşın..." rows="4" style="width:100%;background:#FAFAF7;border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;font-family:'Syne',sans-serif;font-size:14px;color:var(--ink);outline:none;resize:vertical;transition:border-color .2s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      <div class="err" id="err-msg">Mesaj boş olamaz.</div>
+    </div>
+    <button class="btn-main" style="width:auto;padding:12px 28px" onclick="postMessage()">Gönder →</button>
+  </div>
+
+  <!-- FİLTRE -->
+  <div class="chip-row" style="margin-bottom:20px">
+    <div class="chip on filter-chip" data-filter="hepsi" onclick="filterPosts(this)">Tümü</div>
+    <div class="chip filter-chip" data-filter="genel" onclick="filterPosts(this)">💬 Genel</div>
+    <div class="chip filter-chip" data-filter="ipucu" onclick="filterPosts(this)">💡 İpucu</div>
+    <div class="chip filter-chip" data-filter="yorum" onclick="filterPosts(this)">⭐ Tesis Yorumu</div>
+    <div class="chip filter-chip" data-filter="soru" onclick="filterPosts(this)">❓ Soru</div>
+  </div>
+
+  <!-- POSTS -->
+  <div id="posts-list"></div>
+</div>
+
+<footer>
+  <div class="footer-note">Bağımsız bir bildirim servisidir. İBB ile resmi bağlantısı yoktur.</div>
+  <div class="footer-links">
+    <a href="index.html">Takip</a>
+    <a href="tesisler.html">Tesisler</a>
+    <a href="gizlilik.html">Gizlilik</a>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+<script>
+const TOPIC_LABELS = { genel:'💬 Genel', ipucu:'💡 İpucu', yorum:'⭐ Tesis Yorumu', soru:'❓ Soru' };
+let activeTopic = 'genel';
+let activeFilter = 'hepsi';
+
+// Örnek başlangıç postları
+const SEED_POSTS = [
+  { id:'s1', name:'Ahmet K.', topic:'ipucu', msg:'Sabah 08:00-09:00 arası en çok iptal oluyor. O saatlerde sitede hazır olun!', likes:14, time: Date.now()-3600000*2, replies:[] },
+  { id:'s2', name:'Fatma S.', topic:'yorum', msg:'Florya tesisini denedik geçen sene, manzarası inanılmaz. Bu sene yine oraya girmeye çalışıyorum 🤞', likes:9, time: Date.now()-3600000*5, replies:[] },
+  { id:'s3', name:'Mehmet A.', topic:'soru', msg:'Bildirim gelince ne kadar süre var rezervasyon yapmak için? Yetiştiremezsek ne olacak?', likes:3, time: Date.now()-3600000*8, replies:[{name:'Admin', msg:'Genellikle birkaç dakika içinde dolabiliyor, bildirimi alır almaz hemen tıklamanızı öneririz!'}] },
+  { id:'s4', name:'Zeynep T.', topic:'genel', msg:'Bu sistemi kurana çok teşekkürler! Geçen yıl saatlerce oturup F5 basıyordum 😄', likes:22, time: Date.now()-3600000*24, replies:[] },
+];
+
+function getPosts() {
+  const stored = localStorage.getItem('forum_posts');
+  const userPosts = stored ? JSON.parse(stored) : [];
+  return [...SEED_POSTS, ...userPosts].sort((a,b) => b.time - a.time);
+}
+
+function savePosts(userPosts) {
+  localStorage.setItem('forum_posts', JSON.stringify(userPosts));
+}
+
+function getUserPosts() {
+  const stored = localStorage.getItem('forum_posts');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  const h = Math.floor(diff/3600000);
+  const d = Math.floor(diff/86400000);
+  if (m < 1) return 'Az önce';
+  if (m < 60) return m + ' dakika önce';
+  if (h < 24) return h + ' saat önce';
+  return d + ' gün önce';
+}
+
+function renderPosts() {
+  const posts = getPosts().filter(p => activeFilter === 'hepsi' || p.topic === activeFilter);
+  const container = document.getElementById('posts-list');
+  if (posts.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--muted);font-size:14px">Henüz gönderi yok. İlk sen yaz! 👆</div>';
+    return;
+  }
+  container.innerHTML = posts.map(p => `
+    <div class="post-card" id="post-${p.id}">
+      <div class="post-top">
+        <div class="post-avatar">${(p.name||'?')[0].toUpperCase()}</div>
+        <div class="post-meta">
+          <span class="post-name">${p.name || 'Anonim'}</span>
+          <span class="post-time">${timeAgo(p.time)}</span>
+        </div>
+        <div class="topic-tag">${TOPIC_LABELS[p.topic]||p.topic}</div>
+      </div>
+      <div class="post-msg">${escHtml(p.msg)}</div>
+      <div class="post-actions">
+        <button class="post-like" onclick="likePost('${p.id}')">👍 ${p.likes}</button>
+        <button class="post-reply-btn" onclick="toggleReplyBox('${p.id}')">💬 Yanıtla</button>
+      </div>
+      ${p.replies && p.replies.length ? `
+        <div class="replies">
+          ${p.replies.map(r=>`
+            <div class="reply">
+              <span class="reply-name">${r.name||'Anonim'}</span>
+              <span class="reply-msg">${escHtml(r.msg)}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      <div class="reply-box" id="reply-${p.id}" style="display:none">
+        <input type="text" placeholder="Yanıtınız..." id="reply-input-${p.id}" style="flex:1;background:#FAFAF7;border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-family:'Syne',sans-serif;font-size:13px;color:var(--ink);outline:none" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+        <button class="post-like" style="background:var(--gold);color:white;border-color:var(--gold)" onclick="submitReply('${p.id}')">Gönder</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function likePost(id) {
+  const liked = JSON.parse(localStorage.getItem('liked_posts')||'[]');
+  if (liked.includes(id)) return;
+  liked.push(id);
+  localStorage.setItem('liked_posts', JSON.stringify(liked));
+  // Seed postları için sadece UI güncelle
+  const seedPost = SEED_POSTS.find(p=>p.id===id);
+  if (seedPost) { seedPost.likes++; renderPosts(); return; }
+  const ups = getUserPosts();
+  const p = ups.find(x=>x.id===id);
+  if (p) { p.likes++; savePosts(ups); renderPosts(); }
+}
+
+function toggleReplyBox(id) {
+  const box = document.getElementById('reply-'+id);
+  box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+  if (box.style.display === 'flex') document.getElementById('reply-input-'+id).focus();
+}
+
+function submitReply(id) {
+  const input = document.getElementById('reply-input-'+id);
+  const msg = input.value.trim();
+  if (!msg) return;
+  const name = localStorage.getItem('forum_name') || 'Anonim';
+  const seedPost = SEED_POSTS.find(p=>p.id===id);
+  if (seedPost) {
+    seedPost.replies = seedPost.replies || [];
+    seedPost.replies.push({name, msg});
+    renderPosts(); return;
+  }
+  const ups = getUserPosts();
+  const p = ups.find(x=>x.id===id);
+  if (p) { p.replies = p.replies||[]; p.replies.push({name,msg}); savePosts(ups); renderPosts(); }
+}
+
+function selectTopic(el) {
+  document.querySelectorAll('.topic-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  activeTopic = el.dataset.topic;
+}
+
+function filterPosts(el) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  activeFilter = el.dataset.filter;
+  renderPosts();
+}
+
+function postMessage() {
+  const msg = document.getElementById('p-msg').value.trim();
+  if (!msg) { document.getElementById('err-msg').classList.add('show'); return; }
+  document.getElementById('err-msg').classList.remove('show');
+  const name = document.getElementById('p-name').value.trim() || 'Anonim';
+  localStorage.setItem('forum_name', name);
+  const ups = getUserPosts();
+  ups.push({ id:'u'+Date.now(), name, topic:activeTopic, msg, likes:0, time:Date.now(), replies:[] });
+  savePosts(ups);
+  document.getElementById('p-msg').value = '';
+  renderPosts();
+}
+
+renderPosts();
+</script>
+</body>
+</html>
