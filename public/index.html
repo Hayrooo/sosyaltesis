@@ -42,6 +42,18 @@
   </div>
 </div>
 
+<!-- SON AÇILANLAR -->
+<div id="son-acilan-wrap" style="display:none;max-width:580px;margin:0 auto;padding:0 24px 8px">
+  <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 20px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span style="width:8px;height:8px;background:#22C55E;border-radius:50%;display:inline-block;animation:blink 1.5s infinite"></span>
+      <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#15803D">Son 30 Dakikada Açılanlar</span>
+      <span style="margin-left:auto;font-size:11px;color:#86EFAC" id="sa-guncelleme"></span>
+    </div>
+    <div id="sa-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+
 <div class="form-wrap">
   <div class="form-card" id="form-card">
     <div class="field">
@@ -182,6 +194,57 @@
     if(p) p.textContent = s.desc;
   }
 })();
+
+// ── SON AÇILANLAR (JSONBin) ──
+const JSONBIN_BIN_ID = '69afdd97aeb53c760cdeecd4';
+const JSONBIN_ACCESS_KEY = '$2a$10$9XSPJG1OQ9W3styF0tcyxOzqOWHRHexUwDGp2X4SgZ6sbL6hw9uuC';
+
+async function loadSonAcilanlar() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+    });
+    const data = await res.json();
+    const list = data.record?.acilan_tesisler || [];
+
+    // Son 30 dakikayı filtrele
+    const now = Date.now();
+    const son30 = list.filter(t => (now - new Date(t.zaman).getTime()) < 30 * 60 * 1000);
+
+    if (son30.length === 0) return; // Hiç yoksa bölümü gösterme
+
+    document.getElementById('son-acilan-wrap').style.display = 'block';
+    document.getElementById('sa-guncelleme').textContent = 'Az önce güncellendi';
+
+    const saList = document.getElementById('sa-list');
+    saList.innerHTML = son30.map(t => {
+      const dk = Math.floor((now - new Date(t.zaman).getTime()) / 60000);
+      const dkText = dk < 1 ? 'Az önce' : dk + ' dk önce';
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #BBF7D0">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#14532D">${t.tesis}</div>
+            <div style="font-size:11px;color:#16A34A;margin-top:2px">${t.tarih} tarihi açıldı</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:#86EFAC">${dkText}</span>
+            <a href="${t.url}" target="_blank" style="font-size:11px;font-weight:700;background:#22C55E;color:white;border-radius:6px;padding:5px 10px;text-decoration:none">Rezervasyon →</a>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Son satırın border'ını kaldır
+    const items = saList.querySelectorAll('div');
+    if (items.length) items[items.length-1].style.borderBottom = 'none';
+
+  } catch(e) {
+    console.log('Son açılanlar yüklenemedi:', e);
+  }
+}
+
+loadSonAcilanlar();
+// Her 5 dakikada bir yenile
+setInterval(loadSonAcilanlar, 5 * 60 * 1000);
 </script>
 <script>initIndex();</script>
 </body>
