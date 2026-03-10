@@ -206,11 +206,53 @@ tr:hover td{background:rgba(255,255,255,.015)}
 #toast.green{border-color:var(--green-border);color:var(--green)}
 #toast.red{border-color:var(--red-border);color:var(--red)}
 
+/* EDITOR */
+.editor-layout{display:grid;grid-template-columns:340px 1fr;gap:0;height:calc(100vh - 120px);margin:-32px -36px;overflow:hidden}
+.editor-panel{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.editor-panel::-webkit-scrollbar{width:4px}
+.editor-panel::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:4px}
+.editor-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.etab{flex:1;padding:11px 6px;font-size:11px;font-weight:700;letter-spacing:.5px;text-align:center;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s}
+.etab:hover{color:var(--text)}
+.etab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.editor-sections{padding:16px;flex:1}
+.esec{margin-bottom:20px}
+.esec-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.erow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:10px}
+.erow-label{font-size:12px;font-weight:500;color:var(--text);flex:1}
+.erow-desc{font-size:11px;color:var(--muted2);margin-top:1px}
+.e-input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;width:130px;transition:border-color .2s}
+.e-input:focus{border-color:var(--gold)}
+.e-color{width:36px;height:30px;border-radius:6px;border:2px solid var(--border);cursor:pointer;background:none;padding:2px}
+.e-select{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;width:130px}
+.e-range{width:120px;accent-color:var(--gold)}
+.e-textarea{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-family:'Syne',sans-serif;font-size:12px;color:var(--text);outline:none;width:100%;resize:none;margin-top:6px;transition:border-color .2s}
+.e-textarea:focus{border-color:var(--gold)}
+.editor-save-bar{display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.btn-editor-save{background:var(--gold);color:#0F1011;border:none;border-radius:8px;padding:10px 20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;flex:1}
+.btn-editor-save:hover{background:#E0B83C}
+.btn-editor-reset{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:10px 14px;font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-editor-reset:hover{border-color:var(--red-border);color:var(--red)}
+.preview-panel{display:flex;flex-direction:column;background:#E5E7EB}
+.preview-topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0}
+.preview-title{font-size:12px;font-weight:600;color:var(--muted);flex:1}
+.preview-device-btns{display:flex;gap:6px}
+.pdev-btn{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.pdev-btn.active{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+.preview-frame-wrap{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}
+.preview-frame-wrap.mobile{align-items:flex-start}
+#preview-iframe{border:none;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.2);background:white;transition:all .4s;width:100%;height:100%}
+#preview-iframe.mobile{width:390px;height:844px;flex-shrink:0}
+.etab-content{display:none}
+.etab-content.active{display:block}
+
 @media(max-width:768px){
   .sidebar{display:none}
   .main-content{padding:20px}
   .stat-grid{grid-template-columns:1fr 1fr}
   .settings-grid{grid-template-columns:1fr}
+  .editor-layout{grid-template-columns:1fr;height:auto}
+  .preview-panel{display:none}
 }
 </style>
 </head>
@@ -270,6 +312,9 @@ tr:hover td{background:rgba(255,255,255,.015)}
       </div>
       <div class="sb-item" onclick="switchTab('ayarlar',this)">
         <span class="icon">⚙️</span> Site Ayarları
+      </div>
+      <div class="sb-item" onclick="switchTab('editor',this)">
+        <span class="icon">🎨</span> Site Editörü
       </div>
     </nav>
     <div class="sb-footer">
@@ -603,6 +648,243 @@ Rezervasyon için: https://tesislerrezervasyon.ibb.istanbul</textarea>
       </div>
     </div>
 
+    <!-- SİTE EDİTÖRÜ -->
+    <div class="tab-content" id="tab-editor">
+      <div class="editor-layout">
+
+        <!-- SOL: KONTROL PANELİ -->
+        <div class="editor-panel">
+          <div class="editor-tabs">
+            <div class="etab active" onclick="switchEtab('typography',this)">Yazı</div>
+            <div class="etab" onclick="switchEtab('colors',this)">Renkler</div>
+            <div class="etab" onclick="switchEtab('buttons',this)">Butonlar</div>
+            <div class="etab" onclick="switchEtab('layout',this)">Düzen</div>
+          </div>
+
+          <div class="editor-sections">
+
+            <!-- YAZI -->
+            <div class="etab-content active" id="etab-typography">
+              <div class="esec">
+                <div class="esec-title">Ana Başlık (H1)</div>
+                <div class="erow">
+                  <div><div class="erow-label">Font Ailesi</div></div>
+                  <select class="e-select" id="e-h1-font" onchange="liveEdit()">
+                    <option value="'Instrument Serif',serif">Instrument Serif</option>
+                    <option value="'Syne',sans-serif">Syne</option>
+                    <option value="Georgia,serif">Georgia</option>
+                    <option value="'Times New Roman',serif">Times New Roman</option>
+                    <option value="Arial,sans-serif">Arial</option>
+                  </select>
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Boyut</div><div class="erow-desc"><span id="e-h1-size-val">48</span>px</div></div>
+                  <input type="range" class="e-range" id="e-h1-size" min="28" max="72" value="48" oninput="document.getElementById('e-h1-size-val').textContent=this.value;liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Renk</div></div>
+                  <input type="color" class="e-color" id="e-h1-color" value="#1A1714" oninput="liveEdit()">
+                </div>
+              </div>
+
+              <div class="esec">
+                <div class="esec-title">Gövde Metni</div>
+                <div class="erow">
+                  <div><div class="erow-label">Font Ailesi</div></div>
+                  <select class="e-select" id="e-body-font" onchange="liveEdit()">
+                    <option value="'Syne',sans-serif">Syne</option>
+                    <option value="Arial,sans-serif">Arial</option>
+                    <option value="'Helvetica Neue',sans-serif">Helvetica</option>
+                    <option value="Georgia,serif">Georgia</option>
+                  </select>
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Boyut</div><div class="erow-desc"><span id="e-body-size-val">15</span>px</div></div>
+                  <input type="range" class="e-range" id="e-body-size" min="12" max="20" value="15" oninput="document.getElementById('e-body-size-val').textContent=this.value;liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Renk</div></div>
+                  <input type="color" class="e-color" id="e-body-color" value="#5C5750" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Satır Aralığı</div><div class="erow-desc"><span id="e-lh-val">1.7</span></div></div>
+                  <input type="range" class="e-range" id="e-line-height" min="12" max="22" value="17" oninput="document.getElementById('e-lh-val').textContent=(this.value/10).toFixed(1);liveEdit()">
+                </div>
+              </div>
+
+              <div class="esec">
+                <div class="esec-title">Nav Bar</div>
+                <div class="erow">
+                  <div><div class="erow-label">Arka Plan</div></div>
+                  <input type="color" class="e-color" id="e-nav-bg" value="#F8F6F1" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Metin Rengi</div></div>
+                  <input type="color" class="e-color" id="e-nav-color" value="#1A1714" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Logo Metni</div></div>
+                  <input type="text" class="e-input" id="e-nav-logo" value="Sosyal Tesis Takip" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Logo İkon</div></div>
+                  <input type="text" class="e-input" id="e-nav-icon" value="🔔" oninput="liveEdit()" style="width:60px;text-align:center;font-size:18px">
+                </div>
+              </div>
+
+              <div class="esec">
+                <div class="esec-title">Footer</div>
+                <textarea class="e-textarea" id="e-footer-text" rows="3" placeholder="Footer metni..." oninput="liveEdit()">© 2026 Sosyal Tesis Takip · İBB sosyal tesis rezervasyon bildirimi</textarea>
+              </div>
+            </div>
+
+            <!-- RENKLER -->
+            <div class="etab-content" id="etab-colors">
+              <div class="esec">
+                <div class="esec-title">Site Renk Paleti</div>
+                <div class="erow">
+                  <div><div class="erow-label">Vurgu Rengi</div><div class="erow-desc">Buton, link, badge</div></div>
+                  <input type="color" class="e-color" id="e-accent" value="#B8821E" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Sayfa Arka Planı</div></div>
+                  <input type="color" class="e-color" id="e-page-bg" value="#F8F6F1" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Kart Arka Planı</div></div>
+                  <input type="color" class="e-color" id="e-card-bg" value="#FFFFFF" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Kart Kenarlık</div></div>
+                  <input type="color" class="e-color" id="e-card-border" value="#EAE7E2" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Hero Arka Plan</div></div>
+                  <input type="color" class="e-color" id="e-hero-bg" value="#F8F6F1" oninput="liveEdit()">
+                </div>
+              </div>
+
+              <div class="esec">
+                <div class="esec-title">Tesis Kartları</div>
+                <div class="erow">
+                  <div><div class="erow-label">Kart Arka Plan</div></div>
+                  <input type="color" class="e-color" id="e-tcard-bg" value="#FFFFFF" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Seçili Kart</div></div>
+                  <input type="color" class="e-color" id="e-tcard-sel" value="#B8821E" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Tesis Adı Rengi</div></div>
+                  <input type="color" class="e-color" id="e-tcard-text" value="#1A1714" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Köşe Yarıçapı</div><div class="erow-desc"><span id="e-tcard-radius-val">10</span>px</div></div>
+                  <input type="range" class="e-range" id="e-tcard-radius" min="0" max="24" value="10" oninput="document.getElementById('e-tcard-radius-val').textContent=this.value;liveEdit()">
+                </div>
+              </div>
+            </div>
+
+            <!-- BUTONLAR -->
+            <div class="etab-content" id="etab-buttons">
+              <div class="esec">
+                <div class="esec-title">Ana Buton (Kayıt ol)</div>
+                <div class="erow">
+                  <div><div class="erow-label">Arka Plan</div></div>
+                  <input type="color" class="e-color" id="e-btn-bg" value="#1A1714" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Metin Rengi</div></div>
+                  <input type="color" class="e-color" id="e-btn-color" value="#FFFFFF" oninput="liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Köşe Yarıçapı</div><div class="erow-desc"><span id="e-btn-radius-val">12</span>px</div></div>
+                  <input type="range" class="e-range" id="e-btn-radius" min="0" max="32" value="12" oninput="document.getElementById('e-btn-radius-val').textContent=this.value;liveEdit()">
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Boyut</div></div>
+                  <select class="e-select" id="e-btn-size" onchange="liveEdit()">
+                    <option value="small">Küçük</option>
+                    <option value="medium" selected>Orta</option>
+                    <option value="large">Büyük</option>
+                  </select>
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Buton Metni</div></div>
+                  <input type="text" class="e-input" id="e-btn-text" value="Ücretsiz Takibe Başla →" oninput="liveEdit()">
+                </div>
+              </div>
+
+              <div class="esec">
+                <div class="esec-title">Buton Önizleme</div>
+                <div id="btn-preview" style="padding:10px 0">
+                  <button id="btn-prev-el" style="background:#1A1714;color:white;border:none;border-radius:12px;padding:14px 28px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%">Ücretsiz Takibe Başla →</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- DÜZEN -->
+            <div class="etab-content" id="etab-layout">
+              <div class="esec">
+                <div class="esec-title">Sayfa Genişliği</div>
+                <div class="erow">
+                  <div><div class="erow-label">Max Genişlik</div><div class="erow-desc"><span id="e-maxw-val">580</span>px</div></div>
+                  <input type="range" class="e-range" id="e-maxwidth" min="480" max="800" value="580" oninput="document.getElementById('e-maxw-val').textContent=this.value;liveEdit()">
+                </div>
+              </div>
+              <div class="esec">
+                <div class="esec-title">Form Kartı</div>
+                <div class="erow">
+                  <div><div class="erow-label">Gölge</div></div>
+                  <select class="e-select" id="e-card-shadow" onchange="liveEdit()">
+                    <option value="none">Yok</option>
+                    <option value="small">Hafif</option>
+                    <option value="medium" selected>Orta</option>
+                    <option value="large">Belirgin</option>
+                  </select>
+                </div>
+                <div class="erow">
+                  <div><div class="erow-label">Köşe Yarıçapı</div><div class="erow-desc"><span id="e-card-radius-val">20</span>px</div></div>
+                  <input type="range" class="e-range" id="e-card-radius-range" min="0" max="32" value="20" oninput="document.getElementById('e-card-radius-val').textContent=this.value;liveEdit()">
+                </div>
+              </div>
+              <div class="esec">
+                <div class="esec-title">Hızlı Temalar</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+                  <button onclick="applyTheme('default')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;color:var(--text);font-size:11px;font-weight:600;font-family:'Syne',sans-serif">☀️ Varsayılan</button>
+                  <button onclick="applyTheme('dark')" style="background:#1A1A2E;border:1px solid #333;border-radius:8px;padding:10px;cursor:pointer;color:white;font-size:11px;font-weight:600;font-family:'Syne',sans-serif">🌙 Koyu</button>
+                  <button onclick="applyTheme('green')" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:10px;cursor:pointer;color:#14532D;font-size:11px;font-weight:600;font-family:'Syne',sans-serif">🌿 Yeşil</button>
+                  <button onclick="applyTheme('elegant')" style="background:#1C1917;border:1px solid #44403C;border-radius:8px;padding:10px;cursor:pointer;color:#E7E5E4;font-size:11px;font-weight:600;font-family:'Syne',sans-serif">✨ Elegant</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /editor-sections -->
+
+          <div class="editor-save-bar">
+            <button class="btn-editor-reset" onclick="resetEditor()">↺ Sıfırla</button>
+            <button class="btn-editor-save" onclick="saveEditor()">💾 Kaydet & Yayınla</button>
+          </div>
+        </div><!-- /editor-panel -->
+
+        <!-- SAĞ: ÖNİZLEME -->
+        <div class="preview-panel">
+          <div class="preview-topbar">
+            <div class="preview-title">🖥️ Canlı Önizleme</div>
+            <div class="preview-device-btns">
+              <div class="pdev-btn active" onclick="setDevice('desktop',this)">🖥 Masaüstü</div>
+              <div class="pdev-btn" onclick="setDevice('mobile',this)">📱 Mobil</div>
+            </div>
+            <a href="index.html" target="_blank" style="font-size:11px;color:var(--muted);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;margin-left:6px">↗ Tam Ekran</a>
+          </div>
+          <div class="preview-frame-wrap" id="preview-frame-wrap">
+            <iframe id="preview-iframe" src="index.html"></iframe>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /main-content -->
 </div><!-- /admin-app -->
 
@@ -636,7 +918,7 @@ function doLogout(){
 }
 
 // ── TABS ──
-const TAB_TITLES = {dashboard:'Özet',users:'Kullanıcılar',forum:'Forum Moderasyonu',tesisler:'Tesis Durumları',bildirim:'Bildirim Gönder',ayarlar:'Site Ayarları'};
+const TAB_TITLES = {dashboard:'Özet',users:'Kullanıcılar',forum:'Forum Moderasyonu',tesisler:'Tesis Durumları',bildirim:'Bildirim Gönder',ayarlar:'Site Ayarları',editor:'🎨 Site Editörü'};
 function switchTab(id, el){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
@@ -647,6 +929,178 @@ function switchTab(id, el){
   if(id==='forum') renderForumMod();
   if(id==='tesisler') renderTesisStatus();
   if(id==='bildirim') renderNotifHistory();
+  if(id==='editor'){ loadEditorValues(); refreshPreview(); }
+}
+
+// ── EDİTÖR SEKMELERİ ──
+function switchEtab(id, el){
+  document.querySelectorAll('.etab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.etab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('etab-'+id).classList.add('active');
+}
+
+// ── CİHAZ ──
+function setDevice(type, el){
+  document.querySelectorAll('.pdev-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const iframe = document.getElementById('preview-iframe');
+  const wrap = document.getElementById('preview-frame-wrap');
+  if(type==='mobile'){
+    iframe.classList.add('mobile');
+    wrap.classList.add('mobile');
+  } else {
+    iframe.classList.remove('mobile');
+    wrap.classList.remove('mobile');
+  }
+}
+
+// ── EDİTÖR STORAGE ──
+const EDITOR_KEY = 'site_editor';
+function getEditorData(){ return JSON.parse(localStorage.getItem(EDITOR_KEY)||'{}'); }
+
+function loadEditorValues(){
+  const d = getEditorData();
+  const set = (id, val) => { const el = document.getElementById(id); if(el && val!==undefined) el.value = val; };
+  set('e-h1-font', d.h1Font);
+  set('e-h1-size', d.h1Size); if(d.h1Size) document.getElementById('e-h1-size-val').textContent = d.h1Size;
+  set('e-h1-color', d.h1Color);
+  set('e-body-font', d.bodyFont);
+  set('e-body-size', d.bodySize); if(d.bodySize) document.getElementById('e-body-size-val').textContent = d.bodySize;
+  set('e-body-color', d.bodyColor);
+  set('e-line-height', d.lineHeight ? d.lineHeight*10 : 17); if(d.lineHeight) document.getElementById('e-lh-val').textContent = d.lineHeight.toFixed(1);
+  set('e-nav-bg', d.navBg);
+  set('e-nav-color', d.navColor);
+  set('e-nav-logo', d.navLogo);
+  set('e-nav-icon', d.navIcon);
+  set('e-footer-text', d.footerText);
+  set('e-accent', d.accent);
+  set('e-page-bg', d.pageBg);
+  set('e-card-bg', d.cardBg);
+  set('e-card-border', d.cardBorder);
+  set('e-hero-bg', d.heroBg);
+  set('e-tcard-bg', d.tcardBg);
+  set('e-tcard-sel', d.tcardSel);
+  set('e-tcard-text', d.tcardText);
+  set('e-tcard-radius', d.tcardRadius); if(d.tcardRadius) document.getElementById('e-tcard-radius-val').textContent = d.tcardRadius;
+  set('e-btn-bg', d.btnBg);
+  set('e-btn-color', d.btnColor);
+  set('e-btn-radius', d.btnRadius); if(d.btnRadius) document.getElementById('e-btn-radius-val').textContent = d.btnRadius;
+  set('e-btn-size', d.btnSize);
+  set('e-btn-text', d.btnText);
+  set('e-maxwidth', d.maxWidth); if(d.maxWidth) document.getElementById('e-maxw-val').textContent = d.maxWidth;
+  set('e-card-shadow', d.cardShadow);
+  set('e-card-radius-range', d.cardRadius); if(d.cardRadius) document.getElementById('e-card-radius-val').textContent = d.cardRadius;
+  updateBtnPreview();
+}
+
+function collectEditorData(){
+  const g = id => document.getElementById(id)?.value;
+  return {
+    h1Font: g('e-h1-font'), h1Size: g('e-h1-size'), h1Color: g('e-h1-color'),
+    bodyFont: g('e-body-font'), bodySize: g('e-body-size'), bodyColor: g('e-body-color'),
+    lineHeight: parseFloat(g('e-line-height'))/10,
+    navBg: g('e-nav-bg'), navColor: g('e-nav-color'), navLogo: g('e-nav-logo'), navIcon: g('e-nav-icon'),
+    footerText: g('e-footer-text'),
+    accent: g('e-accent'), pageBg: g('e-page-bg'), cardBg: g('e-card-bg'),
+    cardBorder: g('e-card-border'), heroBg: g('e-hero-bg'),
+    tcardBg: g('e-tcard-bg'), tcardSel: g('e-tcard-sel'), tcardText: g('e-tcard-text'), tcardRadius: g('e-tcard-radius'),
+    btnBg: g('e-btn-bg'), btnColor: g('e-btn-color'), btnRadius: g('e-btn-radius'),
+    btnSize: g('e-btn-size'), btnText: g('e-btn-text'),
+    maxWidth: g('e-maxwidth'), cardShadow: g('e-card-shadow'), cardRadius: g('e-card-radius-range')
+  };
+}
+
+let previewDebounce;
+function liveEdit(){
+  updateBtnPreview();
+  clearTimeout(previewDebounce);
+  previewDebounce = setTimeout(refreshPreview, 600);
+}
+
+function updateBtnPreview(){
+  const btn = document.getElementById('btn-prev-el');
+  if(!btn) return;
+  const bg = document.getElementById('e-btn-bg')?.value || '#1A1714';
+  const color = document.getElementById('e-btn-color')?.value || '#ffffff';
+  const radius = document.getElementById('e-btn-radius')?.value || '12';
+  const text = document.getElementById('e-btn-text')?.value || 'Ücretsiz Takibe Başla →';
+  const size = document.getElementById('e-btn-size')?.value || 'medium';
+  const pad = size==='small'?'10px 20px':size==='large'?'18px 36px':'14px 28px';
+  const fs = size==='small'?'12px':size==='large'?'16px':'14px';
+  btn.style.cssText = `background:${bg};color:${color};border:none;border-radius:${radius}px;padding:${pad};font-family:'Syne',sans-serif;font-size:${fs};font-weight:700;cursor:pointer;width:100%;transition:all .2s`;
+  btn.textContent = text;
+}
+
+function refreshPreview(){
+  const d = collectEditorData();
+  const shadows = {none:'none',small:'0 2px 8px rgba(0,0,0,.06)',medium:'0 8px 32px rgba(0,0,0,.08)',large:'0 20px 60px rgba(0,0,0,.14)'};
+  const css = `
+    :root { --gold: ${d.accent||'#B8821E'}; --accent: ${d.accent||'#B8821E'}; }
+    body { background: ${d.pageBg||'#F8F6F1'} !important; font-family: ${d.bodyFont||"'Syne',sans-serif"} !important; font-size: ${d.bodySize||15}px !important; color: ${d.bodyColor||'#5C5750'} !important; line-height: ${d.lineHeight||1.7} !important; }
+    nav { background: ${d.navBg||'#F8F6F1'} !important; color: ${d.navColor||'#1A1714'} !important; }
+    .nav-logo-text { color: ${d.navColor||'#1A1714'} !important; }
+    .nav-link { color: ${d.navColor||'#1A1714'} !important; }
+    .hero { background: ${d.heroBg||'#F8F6F1'} !important; }
+    .hero h1 { font-family: ${d.h1Font||"'Instrument Serif',serif"} !important; font-size: ${d.h1Size||48}px !important; color: ${d.h1Color||'#1A1714'} !important; }
+    .form-wrap, .form-card { max-width: ${d.maxWidth||580}px !important; }
+    .form-card { background: ${d.cardBg||'#fff'} !important; border-color: ${d.cardBorder||'#EAE7E2'} !important; border-radius: ${d.cardRadius||20}px !important; box-shadow: ${shadows[d.cardShadow||'medium']} !important; }
+    .btn-main { background: ${d.btnBg||'#1A1714'} !important; color: ${d.btnColor||'#fff'} !important; border-radius: ${d.btnRadius||12}px !important; }
+    .tesis-item { background: ${d.tcardBg||'#fff'} !important; border-radius: ${d.tcardRadius||10}px !important; color: ${d.tcardText||'#1A1714'} !important; }
+    .tesis-item.selected { background: ${d.tcardSel||'#B8821E'} !important; border-color: ${d.tcardSel||'#B8821E'} !important; }
+  `;
+  const iframe = document.getElementById('preview-iframe');
+  // CSS'i iframe'e enjekte et
+  try {
+    const iDoc = iframe.contentDocument || iframe.contentWindow.document;
+    let styleEl = iDoc.getElementById('admin-editor-css');
+    if(!styleEl){
+      styleEl = iDoc.createElement('style');
+      styleEl.id = 'admin-editor-css';
+      iDoc.head.appendChild(styleEl);
+    }
+    styleEl.textContent = css;
+    // Nav logo güncelle
+    if(d.navLogo){ const el = iDoc.querySelector('.nav-logo-text'); if(el) el.textContent = d.navLogo; }
+    if(d.navIcon){ const el = iDoc.querySelector('.nav-logo-icon'); if(el) el.textContent = d.navIcon; }
+    if(d.btnText){ const el = iDoc.querySelector('.btn-main'); if(el) el.textContent = d.btnText; }
+    // Footer
+    if(d.footerText){ const el = iDoc.querySelector('footer'); if(el) el.textContent = d.footerText; }
+  } catch(e) { console.log('Preview inject error:', e); }
+}
+
+function saveEditor(){
+  const d = collectEditorData();
+  localStorage.setItem(EDITOR_KEY, JSON.stringify(d));
+  // site_settings'e de yaz ki index.html okusun
+  const s = getSiteSettings();
+  s.editorData = d;
+  localStorage.setItem(SITE_SETTINGS_KEY, JSON.stringify(s));
+  toast('Tasarım kaydedildi & yayınlandı ✓','green');
+}
+
+function resetEditor(){
+  if(!confirm('Tüm tasarım değişiklikleri sıfırlansın mı?')) return;
+  localStorage.removeItem(EDITOR_KEY);
+  loadEditorValues();
+  refreshPreview();
+  toast('Varsayılan tasarıma döndü','green');
+}
+
+function applyTheme(name){
+  const themes = {
+    default: { pageBg:'#F8F6F1', cardBg:'#FFFFFF', accent:'#B8821E', btnBg:'#1A1714', btnColor:'#FFFFFF', navBg:'#F8F6F1', heroBg:'#F8F6F1', h1Color:'#1A1714', bodyColor:'#5C5750' },
+    dark:    { pageBg:'#0F1011', cardBg:'#161819', accent:'#C49A2C', btnBg:'#C49A2C', btnColor:'#0F1011', navBg:'#0F1011', heroBg:'#0F1011', h1Color:'#EDEAE4', bodyColor:'#7A756E' },
+    green:   { pageBg:'#F0FDF4', cardBg:'#FFFFFF', accent:'#16A34A', btnBg:'#16A34A', btnColor:'#FFFFFF', navBg:'#F0FDF4', heroBg:'#F0FDF4', h1Color:'#14532D', bodyColor:'#15803D' },
+    elegant: { pageBg:'#1C1917', cardBg:'#292524', accent:'#D4AF70', btnBg:'#D4AF70', btnColor:'#1C1917', navBg:'#1C1917', heroBg:'#1C1917', h1Color:'#E7E5E4', bodyColor:'#A8A29E' }
+  };
+  const t = themes[name]; if(!t) return;
+  Object.entries(t).forEach(([k,v])=>{
+    const map = {pageBg:'e-page-bg',cardBg:'e-card-bg',accent:'e-accent',btnBg:'e-btn-bg',btnColor:'e-btn-color',navBg:'e-nav-bg',heroBg:'e-hero-bg',h1Color:'e-h1-color',bodyColor:'e-body-color'};
+    if(map[k]){ const el = document.getElementById(map[k]); if(el) el.value = v; }
+  });
+  liveEdit();
+  toast('Tema uygulandı — kaydetmeyi unutma!','green');
 }
 
 // ── CLOCK ──

@@ -183,6 +183,31 @@
     document.documentElement.style.setProperty('--gold', s.themeColor);
   }
 
+  // EDİTÖR VERİSİ
+  const ed = s.editorData || JSON.parse(localStorage.getItem('site_editor')||'{}');
+  if(Object.keys(ed).length > 0){
+    const shadows = {none:'none',small:'0 2px 8px rgba(0,0,0,.06)',medium:'0 8px 32px rgba(0,0,0,.08)',large:'0 20px 60px rgba(0,0,0,.14)'};
+    const style = document.createElement('style');
+    style.textContent = `
+      body { ${ed.bodyFont?`font-family:${ed.bodyFont}!important;`:''}${ed.bodySize?`font-size:${ed.bodySize}px!important;`:''}${ed.bodyColor?`color:${ed.bodyColor}!important;`:''}${ed.lineHeight?`line-height:${ed.lineHeight}!important;`:''} }
+      ${ed.pageBg?`body{background:${ed.pageBg}!important}`:''}
+      ${ed.accent?`:root{--gold:${ed.accent}}`:''}
+      nav { ${ed.navBg?`background:${ed.navBg}!important;`:''} }
+      .nav-logo-text, .nav-link { ${ed.navColor?`color:${ed.navColor}!important;`:''} }
+      .hero { ${ed.heroBg?`background:${ed.heroBg}!important;`:''} }
+      .hero h1 { ${ed.h1Font?`font-family:${ed.h1Font}!important;`:''}${ed.h1Size?`font-size:${ed.h1Size}px!important;`:''}${ed.h1Color?`color:${ed.h1Color}!important;`:''} }
+      .form-wrap { ${ed.maxWidth?`max-width:${ed.maxWidth}px!important;`:''} }
+      .form-card { ${ed.cardBg?`background:${ed.cardBg}!important;`:''}${ed.cardBorder?`border-color:${ed.cardBorder}!important;`:''}${ed.cardRadius?`border-radius:${ed.cardRadius}px!important;`:''}${ed.cardShadow?`box-shadow:${shadows[ed.cardShadow]}!important;`:''} }
+      .btn-main { ${ed.btnBg?`background:${ed.btnBg}!important;`:''}${ed.btnColor?`color:${ed.btnColor}!important;`:''}${ed.btnRadius?`border-radius:${ed.btnRadius}px!important;`:''} }
+      .tesis-item { ${ed.tcardBg?`background:${ed.tcardBg}!important;`:''}${ed.tcardRadius?`border-radius:${ed.tcardRadius}px!important;`:''}${ed.tcardText?`color:${ed.tcardText}!important;`:''} }
+      .tesis-item.selected { ${ed.tcardSel?`background:${ed.tcardSel}!important;border-color:${ed.tcardSel}!important;`:''} }
+    `;
+    document.head.appendChild(style);
+    if(ed.navLogo){ const el = document.querySelector('.nav-logo-text'); if(el) el.textContent = ed.navLogo; }
+    if(ed.navIcon){ const el = document.querySelector('.nav-logo-icon'); if(el) el.textContent = ed.navIcon; }
+    if(ed.btnText){ const el = document.querySelector('.btn-main'); if(el) el.textContent = ed.btnText; }
+  }
+
   // METİNLER
   if(s.siteTitle) document.title = s.siteTitle + ' — Boşluk Bildirimi';
   if(s.h1){
