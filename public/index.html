@@ -256,7 +256,12 @@ async function loadSonAcilanlar() {
     rows.forEach(row => {
       if (!row.c || !row.c[4]) return;
       const tesis  = row.c[0]?.v || '';
-      const tarih  = row.c[2]?.v || '';
+      const tarihRaw = row.c[2]?.f || row.c[2]?.v || '';
+      // tarih formatını düzelt: "13.03.2026 13:00:00" → "13 Mart 2026"
+      const aylar = ['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+      let tarih = tarihRaw;
+      const tarihMatch = tarihRaw.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+      if (tarihMatch) tarih = tarihMatch[1] + ' ' + aylar[parseInt(tarihMatch[2])] + ' ' + tarihMatch[3];
       const url    = row.c[3]?.v || '';
       const zaman  = row.c[4]?.v || '';
       if (!zaman) return;
