@@ -239,35 +239,31 @@
 })();
 
 // ── SON AÇILANLAR (Google Sheets) ──
-const SHEET_ID = '1StgUt9qTxEsvJkkUd85SKfm39TYJfISsIewEpPS5JNU';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Bosluklar`;
+// Sütunlar: A=tesis B=tarih C=url D=zaman
+const SHEET_ID = '1StgUt9qTxEsvJkkUd85Skfm39TYJfISsIewEpPS5JNU';
 
 async function loadSonAcilanlar() {
   try {
-    const res = await fetch(SHEET_URL);
+    const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&sheet=Bosluklar&t=' + Date.now();
+    const res = await fetch(url);
     const text = await res.text();
-    // Google Sheets JSON wrapper'ını temizle
-    const json = JSON.parse(text.replace(/^.*?\(/, '').replace(/\);?$/, ''));
+    const jsonStr = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
+    const json = JSON.parse(jsonStr);
     const rows = json.table?.rows || [];
 
     const now = Date.now();
     const son30 = [];
 
     rows.forEach(row => {
-      if (!row.c || !row.c[4]) return;
-      const tesis  = row.c[0]?.v || '';
-      const tarihRaw = row.c[2]?.f || row.c[2]?.v || '';
-      // tarih formatını düzelt: "13.03.2026 13:00:00" → "13 Mart 2026"
-      const aylar = ['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-      let tarih = tarihRaw;
-      const tarihMatch = tarihRaw.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
-      if (tarihMatch) tarih = tarihMatch[1] + ' ' + aylar[parseInt(tarihMatch[2])] + ' ' + tarihMatch[3];
-      const url    = row.c[3]?.v || '';
-      const zaman  = row.c[4]?.v || '';
+      if (!row.c || !row.c[0] || !row.c[0].v) return;
+      const tesis = row.c[0].v;
+      const tarih = row.c[1]?.v || '';
+      const url2  = row.c[2]?.v || '';
+      const zaman = row.c[3]?.v || '';
       if (!zaman) return;
       const zamanMs = new Date(zaman).getTime();
-      if ((now - zamanMs) < 30 * 60 * 1000) {
-        son30.push({ tesis, tarih, url, zaman });
+      if (!isNaN(zamanMs) && (now - zamanMs) < 30 * 60 * 1000) {
+        son30.push({ tesis, tarih, url: url2, zamanMs });
       }
     });
 
@@ -275,31 +271,30 @@ async function loadSonAcilanlar() {
     if (son30.length === 0) { wrap.style.display = 'none'; return; }
 
     wrap.style.display = 'block';
-    const dk0 = Math.floor((now - new Date(son30[0].zaman).getTime()) / 60000);
+    const dk0 = Math.floor((now - son30[0].zamanMs) / 60000);
     document.getElementById('sa-guncelleme').textContent = dk0 < 1 ? 'Az önce' : dk0 + ' dk önce';
 
-    document.getElementById('sa-list').innerHTML = son30.map(t => {
-      const dk = Math.floor((now - new Date(t.zaman).getTime()) / 60000);
+    document.getElementById('sa-list').innerHTML = son30.map(function(t) {
+      const dk = Math.floor((now - t.zamanMs) / 60000);
       const dkText = dk < 1 ? 'Az önce' : dk + ' dk önce';
-      return `<div class="sa-item">
-        <div>
-          <div class="sa-item-name">${t.tesis}</div>
-          <div class="sa-item-date">${t.tarih} tarihi açıldı</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="sa-item-ago">${dkText}</span>
-          <a href="${t.url}" target="_blank" class="sa-item-btn">Rezervasyon →</a>
-        </div>
-      </div>`;
+      return '<div class="sa-item">'
+        + '<div>'
+        + '<div class="sa-item-name">' + t.tesis + '</div>'
+        + '<div class="sa-item-date">' + t.tarih + ' tarihi açıldı</div>'
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:8px">'
+        + '<span class="sa-item-ago">' + dkText + '</span>'
+        + '<a href="' + t.url + '" target="_blank" class="sa-item-btn">Rezervasyon →</a>'
+        + '</div></div>';
     }).join('');
 
   } catch(e) {
-    console.log('Son açılanlar yüklenemedi:', e.message);
+    console.log('Son açılanlar:', e.message);
   }
 }
 
 loadSonAcilanlar();
-setInterval(loadSonAcilanlar, 60 * 1000); // Her 1 dakikada yenile
+setInterval(loadSonAcilanlar, 60000);
 </script>
 <script>initIndex();</script>
 </body>
